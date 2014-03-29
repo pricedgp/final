@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Echo Nest Data Export Script</title>
+
+    <script src="./libs/jquery-1.10.1.js"></script>
+    <script src="./libs/jquery.csv-0.71.js"></script>
+    <script src="./libs/jquery.xdomainajax.js"></script>
+    <script src="./libs/FileSaver.js"></script>
+    <script src="./libs/d3.v3.min.js"></script>
+</head>
+<body>
+
+<script>
+  var APIKey = "";
+
+  var data;
+  var i = 0;
+  var outputData = new Array();
+  var rawData = new Array();
+
+  var maxRecordCount = 5000; // the total number of records to process. Set to 0 to process all
+
+  var errorCount = 0;
+  var maxErrorCount = 1000; // stop executing after this number of errors
+  
+  d3.csv("./whitburn-query-data.csv", function(d) {
+    data = d;
+
+    var firstRow = 
+      "\"artist\"," + 
+      "\"song\"," + 
+      "\"acousticness\"," + 
+      "\"danceability\"," + 
+      "\"duration\"," + 
+      "\"energy\"," + 
+      "\"key\"," + 
+      "\"liveness\"," + 
+      "\"loudness\"," + 
+      "\"mode\"," + 
+      "\"speechiness\"," + 
+      "\"tempo\"," + 
+      "\"time_signature\"," + 
+      "\"valence\"";
+
+    outputData.push(firstRow);
+
+    queryLoop();
+  });
+
+  function queryLoop()
+  {
+    setTimeout(function() {
+      var getURL = "http://developer.echonest.com/api/v4/song/search?" + 
+          "api_key=" + APIKey + 
+          "&title=" + encodeURIComponent(data[i].Song) + 
+          "&artist=" + encodeURIComponent(data[i].Artist) + 
+          "&format=json&results=1&bucket=audio_summary";
+
+      console.log("query: " + getURL);
+
+      $.ajax({
+        url: getURL,
+        type: "GET",
+        dataType: 'json',
+        cache: false,
+        timeout: 4000, 
+        success: function(result)
+        {
+          if (result.response.status.message == "Success" && result.response.songs.length > 0 && 
+            result.response.songs[0].audio_summary != null)
+          {
+            var rowData = "";
+
+            var artist = data[i].Artist;
+            var song = data[i].Song;
+
+            var acousticness = result.response.songs[0].audio_summary.acousticness;
+            var danceability = result.response.songs[0].audio_summary.danceability;
+            var duration = result.response.songs[0].audio_summary.duration;
+            var energy = result.response.songs[0].audio_summary.energy;
+            var key = result.response.songs[0].audio_summary.key;
+            var liveness = result.response.songs[0].audio_summary.liveness;
+            var loudness = result.response.songs[0].audio_summary.loudness;
+            var mode = result.response.songs[0].audio_summary.mode;
+            var speechiness = result.response.songs[0].audio_summary.speechiness;
+            var tempo = result.response.songs[0].audio_summary.tempo;
+            var time_signature = result.response.songs[0].audio_summary.time_signature;
+            var valence = result.response.songs[0].audio_summary.valence;
+
+            var rowData = 
+              "\"" + artist + "\"," + 
+              "\"" + song + "\"," + 
+              "\"" + acousticness + "\"," + 
+              "\"" + danceability + "\"," + 
+              "\"" + duration + "\"," + 
+              "\"" + energy + "\"," + 
+              "\"" + key + "\"," + 
+              "\"" + liveness + "\"," + 
+              "\"" + loudness + "\"," + 
+              "\"" + mode + "\"," + 
+              "\"" + speechiness + "\"," + 
+              "\"" + tempo + "\"," + 
+              "\"" + time_signature + "\"," + 
+              "\"" + valence + "\"";
+
+            var now = new Date();
+            console.log("time: " + now);
+            console.log("result: " + rowData);
+            outputData.push(rowData);
+
+            i++;
+
+            if (i < data.length && i <= maxRecordCount)
+              queryLoop();
+            else
+              saveToFile(outputData,"outputData.csv");
+          }
+          else
+          {
+            console.log("query success, but no record for " + data[i].Artist + " " + data[i].Song);
+
+            i++;
+
+            if (i < data.length && i <= maxRecordCount)
+              queryLoop();
+            else
+              saveToFile(outputData,"outputData.csv");
+          }
+        },
+        error: function(e)
+        {
+          console.log("error getting data" + e);
+
+          i++;
+
+          if (i < data.length && i <= maxRecordCount)
+          {
+            errorCount++;
+
+            if (errorCount <= maxErrorCount)
+              queryLoop();
+            else
+              saveToFile(outputData,"outputData.csv");
+          }
+          else
+              saveToFile(outputData,"outputData.csv");
+        }
+      });
+
+    }, 4000);
+  }
+
+  var saveToFile = function(arrayOfLines, fileName) {
+     /* adds linebreaks at the end*/
+     var blob, blobText;
+     blobText = arrayOfLines.map(function(d) {
+       if (d.endsWith("\n")) {
+         return d;
+       } else {
+         return d + "\n";
+       }
+     });
+     blob = new Blob(blobText, {
+       type: "text/plain;charset=utf-8"
+     });
+     return saveAs(blob, fileName);
+   };
+
+   String.prototype.endsWith = function(suffix) {
+     return this.indexOf(suffix, this.length - suffix.length) !== -1;
+   };
+
+</script>
+</body>
+</html>
