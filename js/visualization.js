@@ -1,8 +1,10 @@
-var econData, qualityData, currentSelection = "danceability";
+var econData, qualityData, econStoriesData, 
+    currentSelection = "danceability",
+    sortOrder = 'desc';
 
 var margin = {top: 10, right: 15, bottom: 100, left: 40},
     margin2 = {top: 430, right: 10, bottom: 20, left: 40},
-    width = 860 - margin.left - margin.right,
+    width = 895 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
     height2 = 500 - margin2.top - margin2.bottom,
     musicQualHeight = 300,
@@ -182,36 +184,51 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
   {
     qualityData = data2;
 
-    var danceHeight = qualScale(d3.mean(data2.map(function(d) { return d.danceability; })));
-    var energyHeight = qualScale(d3.mean(data2.map(function(d) { return d.energy; })));
-    var moodHeight = qualScale(d3.mean(data2.map(function(d) { return d.mood; })));
+    d3.csv("./data/econ_stories.csv", function(data3)
+    {
+      econStoriesData = data3;
 
-    var danceRect = danceAveGraph.append("rect")
-      .attr("height", danceHeight)
-      .attr("y", function() { return musicQualHeight - danceHeight; })
-      .attr("width", musicQualRectWidth)
-      .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-      .attr("class","musicQualDance");
+      var danceHeight = qualScale(d3.mean(data2.map(function(d) { return d.danceability; })));
+      var energyHeight = qualScale(d3.mean(data2.map(function(d) { return d.energy; })));
+      var moodHeight = qualScale(d3.mean(data2.map(function(d) { return d.mood; })));
 
-    var energyRect = energyAveGraph.append("rect")
-      .attr("height", energyHeight)
-      .attr("y", function() { return musicQualHeight - energyHeight; })
-      .attr("width", musicQualRectWidth)
-      .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-      .attr("class","musicQualEnergy");
+      var danceRect = danceAveGraph.append("rect")
+        .attr("height", danceHeight)
+        .attr("y", function() { return musicQualHeight - danceHeight; })
+        .attr("width", musicQualRectWidth)
+        .attr("x", (musicQualWidth - musicQualRectWidth)/2)
+        .attr("class","musicQualDance");
 
-    var moodRect = moodAveGraph.append("rect")
-      .attr("height", moodHeight)
-      .attr("y", function() { return musicQualHeight - moodHeight; })
-      .attr("width", musicQualRectWidth)
-      .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-      .attr("class","musicQualMood");
+      var energyRect = energyAveGraph.append("rect")
+        .attr("height", energyHeight)
+        .attr("y", function() { return musicQualHeight - energyHeight; })
+        .attr("width", musicQualRectWidth)
+        .attr("x", (musicQualWidth - musicQualRectWidth)/2)
+        .attr("class","musicQualEnergy");
 
-    danceRect.on("click", function() { populateMusicDetailsTable("danceability"); });
-    energyRect.on("click", function() { populateMusicDetailsTable("energy"); });
-    moodRect.on("click", function() { populateMusicDetailsTable("mood"); });
+      var moodRect = moodAveGraph.append("rect")
+        .attr("height", moodHeight)
+        .attr("y", function() { return musicQualHeight - moodHeight; })
+        .attr("width", musicQualRectWidth)
+        .attr("x", (musicQualWidth - musicQualRectWidth)/2)
+        .attr("class","musicQualMood");
 
-    populateMusicDetailsTable("danceability");
+      danceRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("danceability"); });
+      energyRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("energy"); });
+      moodRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("mood"); });
+
+      d3.select("#MusicPropType h5").on("click", function() {
+        if (sortOrder == 'desc')
+          sortOrder = 'asc';
+        else
+          sortOrder = 'desc';
+
+        populateMusicDetailsTable(currentSelection);
+      });
+
+      populateMusicDetailsTable("danceability");
+      populateStoriesTable();
+    });
   });
 });
 
@@ -237,24 +254,25 @@ function brushed() {
     .attr("height", moodHeight)
     .attr("y", function() { return musicQualHeight - moodHeight });
 
-    populateMusicDetailsTable(currentSelection);
+  populateMusicDetailsTable(currentSelection);
+  populateStoriesTable();
 }
 
 function populateMusicDetailsTable(valueProperty)
 {
-  var topTracks = getTopByProperty(qualityData, valueProperty);
+  var tracks = sortByProperty(qualityData, valueProperty);
   currentSelection = valueProperty;
 
   var tableHTML = "";
 
-  for (var i = 0; i < topTracks.length; i++)
+  for (var i = 0; i < tracks.length; i++)
   {
     tableHTML += "<tr>" + 
                     "<td>" + (i+1) + "</td>" + 
-                    "<td>" + topTracks[i].track + "</td>" + 
-                    "<td>" + topTracks[i].artist + "</td>" + 
+                    "<td>" + tracks[i].track + "</td>" + 
+                    "<td>" + tracks[i].artist + "</td>" + 
                     '<td><svg width="' + musicQualWidth + '" height="25px" ><rect width="' + 
-                      qualScale2(topTracks[i][valueProperty]) + '" height="15px" ' + 
+                      qualScale2(tracks[i][valueProperty]) + '" height="15px" ' + 
                       ' class="'
 
     if (valueProperty == "danceability")
@@ -275,6 +293,26 @@ function populateMusicDetailsTable(valueProperty)
     d3.select("#MusicPropType h5").html("Mood");
 
   d3.select("#musicDetailsTable tbody").html(tableHTML);
+}
+
+function populateStoriesTable()
+{
+  var minDate = brush.extent()[0];
+  var maxDate = brush.extent()[1];
+
+  var storiesHTML = "";
+
+  for (var i = 0; i < econStoriesData.length; i++)
+  {
+    var d = econStoriesData[i];
+
+    if ((d.year >= minDate.getFullYear() && d.year <= maxDate.getFullYear()) || minDate == maxDate)
+    {
+      storiesHTML += "<tr><td>" + d.year + "</td><td>" + d.story + "</td>";
+    }
+  }
+
+  d3.select("#storyTable tbody").html(storiesHTML);
 }
 
 // ensure data elements are cast in their proper types
@@ -313,7 +351,7 @@ function filterArray(array,valueProperty,dateProperty)
   return returnArray;
 }
 
-function getTopByProperty(array, valueProperty)
+function sortByProperty(array, valueProperty)
 {
   var returnArray = new Array();
   var tempArray = new Array();
@@ -332,11 +370,20 @@ function getTopByProperty(array, valueProperty)
     }
   }
 
-  tempArray.sort(function (a,b) {
+  tempArray.sort(function (a,b)
+  {
     if (a[valueProperty] > b[valueProperty])
-      return -1;
+    {
+      if (sortOrder == 'desc')
+        return -1;
+      else
+        return 1;
+    }
     else if (a[valueProperty] < b[valueProperty])
-      return 1;
+      if (sortOrder == 'desc')
+        return 1;
+      else
+        return -1;
     else
     {
       if (a.track < b.track)
