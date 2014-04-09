@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lyrics Utility Script</title>
+
+    <script src="./libs/d3.v3.min.js"></script>
+    <!--script src="./libs/lyricsNew.js"></script -->
+    <script src="./libs/FileSaver.js"></script>
+    <script src="./libs/jquery-1.10.1.js"></script>
+    <script src="./libs/jquery.csv-0.71.js"></script>
+
+
+
+
+</head>
+<body>
+
+<script type="text/javascript">
+
+var lyricsWeWant;
+
+var lyricGroups;
+var trackData;
+var trackMap;
+var categories = [];
+
+// ------------------------------------------------------------------------------------
+// data files should be in ./data/
+
+/*
+Parse a wordbag file and show counts in the console
+
+*/
+var BAGS = "wordbags-group1.json";      // concatenated wordbags
+
+
+  var allbags;
+
+  d3.text("./data/" + BAGS, function(text) {
+
+    // allbags = JSON.parse(text);
+    parseJson(text);
+    
+    console.log("done"); 
+
+          
+    });
+ 
+  
+function parseJson(text) {
+
+  allbags = JSON.parse(text);
+
+  allwords = allbags[0].words;
+  var total = 0;
+  var hits = 0;
+  var misses = 0;
+
+  allwords.forEach(function(track) {
+    total++;
+    console.log(track.track);
+    console.log(track.sum[0]);
+    if (track.det.length > 0) {
+      hits++
+      console.log("details");
+      track.det.forEach(function(i) {
+        console.log("id: " + i.id);
+        console.log("cnt: " + i.cnt);
+      });
+    }
+    else {
+      misses++;
+    }
+  });
+
+  console.log("Total: " + total);
+  console.log("Hits: " + hits);
+  console.log("Misses: " + misses);
+}
+
+
+
+
+
+</script>
+</body>
+</html>

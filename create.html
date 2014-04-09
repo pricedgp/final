@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lyrics Script</title>
+
+    <script src="./libs/d3.v3.min.js"></script>
+    <!--script src="./libs/lyricsNew.js"></script -->
+    <script src="./libs/FileSaver.js"></script>
+    <script src="./libs/jquery-1.10.1.js"></script>
+    <script src="./libs/jquery.csv-0.71.js"></script>
+
+
+
+
+</head>
+<body>
+
+<script type="text/javascript">
+
+var lyricsWeWant;
+
+var lyricGroups;
+var trackData;
+var trackMap;
+var categories = [];
+
+// ------------------------------------------------------------------------------------
+// data files should be in ./data/
+
+var STEMGROUP = "stemGroupings-emo.csv";      // used to derive lyricgroups
+
+
+
+// ==========================================
+/* Populates categories; depends on lyricGroups.
+To make life simpler, this function gets the list of
+unique groups ("buckets") that are used to classify the
+terms we search.
+*/
+
+// ---------- for generating lyricGroups ------------------
+// 
+
+  console.log("entering getStemGroups");
+
+  d3.text("./data/" + STEMGROUP, function(text) {
+
+    lyricsWeWant = d3.csv.parse(text);
+    
+    createLyricReference();
+          
+    });
+ 
+  
+
+
+
+// ==========================================
+function createLyricReference() {
+  console.log("entering createLyricReference");
+// creates the lyricGroups.csv file
+
+// (must manually copy from downloads directory into data)
+// Prerequisite: topWordsInOrder.csv must exist
+
+  var data;
+  var lyricsData;
+  var lyricMap;
+  
+
+  // 5000 words in this file
+  // position is the key to each stem
+  //d3.tsv("./data/topWordsInOrder.csv", function(error, data) {
+
+d3.text("./data/topWordsInOrder.tsv", function(text) {
+
+    lyricsData = d3.tsv.parse(text);
+          
+      // do something if needed
+    // manually create a map
+    // 
+    lyricMap = d3.map();
+    lyricsData.forEach(function(e) {
+    // the word stem is the key (1st param), the position/rank is the value (2nd)
+      lyricMap.set(e.stem, e.key);
+    });
+
+   var item, idx;
+     var lyricGroup = {};
+     var myArray = [];
+
+    lyricsWeWant.forEach(function (e) {
+      if ( lyricMap.get(e.stem) ) {
+        // find key using stem
+        item = lyricMap.get(e.stem);
+        lyricGroup = {"key": +item, "word": e.stem, "group": e.group};
+
+        myArray.push(lyricGroup);
+      }
+    });
+
+    console.log(myArray.length);
+    saveToFile(myArray, "lyricGroups.json");
+     
+   
+  });
+ 
+}
+
+
+// ===============================================
+  var saveToFile = function(object, filename){
+
+      var blob, blobText;
+      blobText = [JSON.stringify(object, '\t')];
+      blob = new Blob(blobText, {
+          type: "text/plain;charset=utf-8"
+      });
+      saveAs(blob, filename);
+     
+  }
+
+
+
+
+    var saveArrayToFile = function(arrayOfLines, fileName) {
+     /* adds linebreaks at the end*/
+     var blob, blobText;
+     blobText = arrayOfLines.map(function(d) {
+       if (d.endsWith("\n")) {
+         return d;
+       } else {
+         return d + "\n";
+       }
+     });
+     blob = new Blob(blobText, {
+       type: "text/plain;charset=utf-8"
+     });
+     return saveAs(blob, fileName);
+   };
+
+   String.prototype.endsWith = function(suffix) {
+     return this.indexOf(suffix, this.length - suffix.length) !== -1;
+   };
+
+
+
+
+</script>
+</body>
+</html>

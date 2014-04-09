@@ -4,6 +4,29 @@ var trackData;
 var trackMap;
 var categories;
 /*
+Files needed (manual step): 
+  topWordsInOrder.tsv
+  stemGroupings.csv
+  mxm_sample.txt (for testing -- 500 rows) -- use mxm_full.txt for real
+
+TODO:
+
+
+Create whitburn.csv (manual step)
+Function to get that with d3.csv
+
+Goal of fileoutput: Create a json file that contains, for each track in 
+any csv that contains a xxx field:
+    - trackID
+    - array of stem/count/group objects (what to call this object?)
+
+Will run for either the Whitburn csv or a reduced set of this.
+For each track ID in the csv:
+
+
+
+
+
 Purpose: Create a file that contains the key, stem and group
 of each word stem listed in the selectedStems.csv file.
 The selectedStems.csv file is manually created. It contains
@@ -20,10 +43,13 @@ which was manually extracted from the Echo Nest train file
 To extract, take the first row of that file (it's 5000 words), save
 it as topWords.txt, and then run the following bash command:
 cat topWords.txt | sed s/,/\\n/g > topWordsInOrder.txt
-After than
+
 */
+
+
 // ==========================================
 function createLyricReference() {
+  console.log("entering createLyricReference");
 // creates the lyricGroups.csv file
 // TODO: figure how to put in data directory
 // (now must manually copy from downloads directory into data)
@@ -38,9 +64,14 @@ function createLyricReference() {
   
   // 5000 words in this file
   // position is the key to each stem
-  d3.tsv("./data/topWordsInOrder.csv", function(error, data) {
-    lyricsData = data;
+  //d3.tsv("./data/topWordsInOrder.csv", function(error, data) {
 
+
+
+d3.tsv("./data/topWordsInOrder.tsv", function(error, data) {
+    lyricsData = data;
+          
+      // do something if needed
     // manually create a map
     // 
     lyricMap = d3.map();
@@ -49,23 +80,27 @@ function createLyricReference() {
       lyricMap.set(e.stem, e.key);
     });
 
-    var myArray = [];
+   var item, idx;
+     var lyricGroup = {};
+     var myArray = [];
 
-    var item, idx;
     lyricsWeWant.forEach(function (e) {
       if ( lyricMap.get(e.stem) ) {
         // find key using stem
         item = lyricMap.get(e.stem);
-        myArray.push({"key": +item, "word": e.stem, "group": e.group});
+        lyricGroup = {"key": +item, "word": e.stem, "group": e.group};
+
+        myArray.push(lyricGroup);
       }
     });
 
     console.log(myArray.length);
-    // saveToFile(myArray, "lyricGroups.csv");
-    lyricGroups = myArray;
-
+    saveToFile(myArray, "lyricGroups.json");
+    
+    
    
   });
+  return lyricGroups;
 };
 
 // ==========================================
@@ -75,21 +110,19 @@ unique groups ("buckets") that are used to classify the
 terms we search.
 */
 function getCategories() {
+  console.log("entering getCategories");
 
-  if (lyricGroups == undefined) {
-    createLyricReference();
-  }
-
-  lyricGroups.forEach(function(item) {
-    if (categories.indexOf(item.group) < 0) {// if not already there
-      categories.push(item.group);
-    }
-  });
+    lyricGroups.forEach(function(item) {
+      if (categories.indexOf(item.group) < 0) {// if not already there
+        categories.push(item.group);
+      }
+    });
 }
 
 
 // ==========================================
 function getStemGroups() {
+  console.log("entering getStemGroups");
     
     d3.csv("./data/stemGroupings.csv", function(error, data) {
       lyricsWeWant = data;
@@ -103,9 +136,12 @@ function getStemGroups() {
   // loads lyricGroups 
   // this is loaded from file created by createLyricReference()
   function loadLyricGroups() {
+    console.log("entering loadLyricGroups");
 
-    d3.csv("./data/lyricGroups.csv", function(error, data) {
+    d3.json("./data/lyricGroups.json", function(error, data) {
       lyricGroups = data;
+
+      console.log("lyricGroups -- ");
 
     });
   }
@@ -118,6 +154,8 @@ function getStemGroups() {
 */
 
 function loadTrackData() {
+console.log("entering loadTrackData");
+
   var myRows;
   /*
   Each row looks like this:
@@ -139,6 +177,7 @@ function loadTrackData() {
       // create trackId as key, and values[{"stemID": xx, "count": xx}]
       var splitStr = [];
       var trackId; 
+      var trackCount = {};
       myRows.forEach(function(row) {
         var values = [];
         // elements in the row array:
@@ -148,12 +187,35 @@ function loadTrackData() {
           }
           if (i > 1) { // skip the keys (0, 1)
             splitStr = element.split(":"); 
-            values.push({"stemID": splitStr[0], "count": splitStr[1]});
+            trackCount = {"stemID": splitStr[0], "count": splitStr[1]};
+            values.push(trackCount);
           }
         }); // finished with element -- add to map
         trackMap.set(trackId, values);
 
       }); // next row
+      // populate group counts ==============================
+      lyricGroups.forEach(function(lg) {
+        if (lg.key == trackObject.stemID) {
+          count = trackObject.count; 
+        }
+        else {
+          count = 0;
+        }
+        Details.push({"stem": lg.word, "count": count});
+        // Summary
+        groupCount = GroupCount.get(lg.group).count + count;
+        GroupCount.set(lg.group, groupCount);
+
+      });
+      Summary.push(GroupCount.values); 
+
+      WordBag.push({"summary": Summary, "details": Details});
+
+      console.log("Wordbag: " + WordBag)
+
+      return WordBag;
+      
 
     });
   }
@@ -167,18 +229,24 @@ Details: Array of WordDetail object {"stem": wordStem, "count": stemCount}
 
 */
 function getWordBag(trackId) {
-  var WordBag = [];
+  var WordBag;
   var Summary = [];
   var Detail = [];
   var trackObject;
   var GroupCount = d3.map();
   var count = 0;
-  // make sure source objects are initialized
-  // init();
 
-  categories.forEach(function(item) {
-    GroupCount.set(item, count);
-  })
+  // make sure source objects are initialized
+  // this is problematic...
+  console.log("calling init from getWordBag");
+  init(function() {
+
+    categories.forEach(function(item) {
+      GroupCount.set(item, count);
+    })
+
+  });
+
 
   // get trackMap object
   trackObject = trackMap.get(trackId);
@@ -216,32 +284,40 @@ function getWordBag(trackId) {
 
   WordBag.push({"summary": Summary, "details": Details});
 
+  console.log("Wordbag: " + WordBag)
+
   return WordBag;
 
 }
 
 
+
 // =============================================
-var init = function() {
-  if (trackMap == undefined) {
-    // initialize it
-    loadTrackData();
-  }
+function init() {
+    console.log("entering init function");
 
-  if (lyricGroups == undefined) {
-    // initialize it
-    createLyricReference();
-  }
-
+  // assume that if categories defined, all else done too
   if (categories == undefined) {
-    getCategories();
-  }
+    // 
+    loadTrackData(function(){
+        console.log("1) calling loadTrackData from init");
+
+      createLyricReference(function() {
+        console.log("2) calling createLyricReference from init");
+
+        getCategories(function() {
+            console.log("3) calling getCategories from init");
+
+        });
+      }); // end createLyricReference
+    }); // end getCategories
+  } // end if
 
 }
 
 
+// ===============================================
   var saveToFile = function(object, filename){
-    lyricGroups = myArray;
 
       var blob, blobText;
       blobText = [JSON.stringify(object, '\t')];

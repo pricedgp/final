@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Music Attributes</title>
+
+		<link rel="Stylesheet" href="./css/style.css" type="text/css">
+    	<script src="./libs/d3.v3.min.js"></script>
+	</head>
+	<body>
+		<div id="viz">
+			<div id="musicQualities">
+				<table>
+					<thead>
+						<tr><th colspan="3"><h5>Musical Qualities</h5></th></tr>
+						<tr>
+							<th><h5>Danceability</h5></th>
+							<th><h5>Energy</h5></th>
+							<th><h5>Mood</h5></th>
+					</thead>
+					<tbody>
+						<tr>
+							<td id="danceAve"></td>
+							<td id="energyAve"></td>
+							<td id="moodAve"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="lyricQualities">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="5"><h5>Lyrics</h5></th>
+						</tr>
+						<tr>
+							<th><h5>Money</h5></th>
+							<th><h5>Positive Emotions</h5></th>
+							<th><h5>Positive Outlook</h5></th>
+							<th><h5>Negative Emotions</h5></th>
+							<th><h5>Negative Outlook</h5></th>
+						</tr>
+					</thead>
+					<tbody>
+						<td id="moneyCount"></td>
+						<td id="posEmoteCount"></td>
+						<td id="posOutCount"></td>
+						<td id="negEmoteCount"></td>
+						<td id="negOutCount"></td>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="musicDetails">
+				<table id="musicDetailsTable">
+					<thead>
+						<tr>
+							<th><h5>#</h5></th>
+							<th><h5>Title</h5></th>
+							<th><h5>Artist</h5></th>
+							<th id="MusicPropType"><h5>Property</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div><br />
+
+			<div id="graph"></div>
+		</div>
+		
+		<div id="story">
+			<div id="topSongs">
+			</div>
+			<div id="storyDetails">
+			</div>
+		</div>
+	</body>
+
+	<script src="./js/visualization.js"></script>
+</html>

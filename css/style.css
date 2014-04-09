@@ -1,0 +1,76 @@
+h5
+{
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+div
+{
+	float: left;
+}
+svg
+{
+	font: 10px sans-serif;
+}
+.area
+{
+	fill: steelblue;
+	stroke-width: 1px;
+	clip-path: url(#clip);
+}
+.line, .spLine
+{
+	fill: none;
+	stroke: steelblue;
+	stroke-width: 2;
+	shape-rendering: crispEdges;
+	clip-path: url(#clip);
+}
+.spLine
+{
+	stroke: red;
+}
+.axis path, .axis line
+{
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+.brush .extent
+{
+	stroke: #fff;
+	fill-opacity: .125;
+	shape-rendering: crispEdges;
+}
+.musicQualDance
+{
+	fill: #69803A;
+}
+.musicQualEnergy
+{
+	fill: #297082;
+}
+.musicQualMood
+{
+	fill: #763026;
+}
+th
+{
+	background-color: #E9EDF8;
+}
+table,th,td
+{
+	border: 1px solid #ccc;
+	border-collapse: collapse;
+}
+.moneyCircle
+{
+	fill: #808080;
+}
+.positiveCircle
+{
+	fill: #FFFF67;
+}
+.negativeCircle
+{
+	fill: #3476CD;
+}
