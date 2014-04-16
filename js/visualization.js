@@ -1,4 +1,4 @@
-var econData, qualityData, econStoriesData, 
+var econData, qualityData, econStoriesData, wordData = {}, 
     currentSelection = "danceability",
     sortOrder = 'desc';
 
@@ -21,7 +21,8 @@ var x = d3.time.scale().range([0, width-margin.right]),
     y2 = d3.scale.linear().range([height2, 0]),
     y3 = d3.scale.linear().range([height, 0]),
     qualScale = d3.scale.linear().range([500,0]).domain([0,1]),
-    qualScale2 = d3.scale.linear().range([0,70]).domain([0,1]);;
+    qualScale2 = d3.scale.linear().range([0,70]).domain([0,1]),
+    circleScale = d3.scale.linear().range([0,10]);
 
 // set up axis scales
 var xAxis = d3.svg.axis().scale(x).orient("bottom"),
@@ -188,46 +189,59 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
     {
       econStoriesData = data3;
 
-      var danceHeight = qualScale(d3.mean(data2.map(function(d) { return d.danceability; })));
-      var energyHeight = qualScale(d3.mean(data2.map(function(d) { return d.energy; })));
-      var moodHeight = qualScale(d3.mean(data2.map(function(d) { return d.mood; })));
+      d3.json("./data/wordbags-group1.json", function(data4) 
+      {
+        for (var i = 0; i < data4[0].words.length; i++)
+        {
+          var d = data4[0].words[i];
 
-      var danceRect = danceAveGraph.append("rect")
-        .attr("height", danceHeight)
-        .attr("y", function() { return musicQualHeight - danceHeight; })
-        .attr("width", musicQualRectWidth)
-        .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-        .attr("class","musicQualDance");
+          if (d.track != null && d.sum != null && d.det != null)
+          {
+            wordData[d.track] = {counts:d.sum, words:d.det};
+          }
+        }
 
-      var energyRect = energyAveGraph.append("rect")
-        .attr("height", energyHeight)
-        .attr("y", function() { return musicQualHeight - energyHeight; })
-        .attr("width", musicQualRectWidth)
-        .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-        .attr("class","musicQualEnergy");
+        var danceHeight = qualScale(d3.mean(data2.map(function(d) { return d.danceability; })));
+        var energyHeight = qualScale(d3.mean(data2.map(function(d) { return d.energy; })));
+        var moodHeight = qualScale(d3.mean(data2.map(function(d) { return d.mood; })));
 
-      var moodRect = moodAveGraph.append("rect")
-        .attr("height", moodHeight)
-        .attr("y", function() { return musicQualHeight - moodHeight; })
-        .attr("width", musicQualRectWidth)
-        .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-        .attr("class","musicQualMood");
+        var danceRect = danceAveGraph.append("rect")
+          .attr("height", danceHeight)
+          .attr("y", function() { return musicQualHeight - danceHeight; })
+          .attr("width", musicQualRectWidth)
+          .attr("x", (musicQualWidth - musicQualRectWidth)/2)
+          .attr("class","musicQualDance");
 
-      danceRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("danceability"); });
-      energyRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("energy"); });
-      moodRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("mood"); });
+        var energyRect = energyAveGraph.append("rect")
+          .attr("height", energyHeight)
+          .attr("y", function() { return musicQualHeight - energyHeight; })
+          .attr("width", musicQualRectWidth)
+          .attr("x", (musicQualWidth - musicQualRectWidth)/2)
+          .attr("class","musicQualEnergy");
 
-      d3.select("#MusicPropType h5").on("click", function() {
-        if (sortOrder == 'desc')
-          sortOrder = 'asc';
-        else
-          sortOrder = 'desc';
+        var moodRect = moodAveGraph.append("rect")
+          .attr("height", moodHeight)
+          .attr("y", function() { return musicQualHeight - moodHeight; })
+          .attr("width", musicQualRectWidth)
+          .attr("x", (musicQualWidth - musicQualRectWidth)/2)
+          .attr("class","musicQualMood");
 
-        populateMusicDetailsTable(currentSelection);
+        danceRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("danceability"); });
+        energyRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("energy"); });
+        moodRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("mood"); });
+
+        d3.select("#MusicPropType h5").on("click", function() {
+          if (sortOrder == 'desc')
+            sortOrder = 'asc';
+          else
+            sortOrder = 'desc';
+
+          populateMusicDetailsTable(currentSelection);
+        });
+
+        populateMusicDetailsTable("danceability");
+        populateStoriesTable();
       });
-
-      populateMusicDetailsTable("danceability");
-      populateStoriesTable();
     });
   });
 });
