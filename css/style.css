@@ -17,6 +17,11 @@ svg
 	stroke-width: 1px;
 	clip-path: url(#clip);
 }
+
+.lit
+{
+	color: orange;
+}
 .line, .spLine
 {
 	fill: none;
@@ -59,18 +64,7 @@ th
 }
 table,th,td
 {
-	border: 1px solid #ccc;
+	border: none;
 	border-collapse: collapse;
-}
-.moneyCircle
-{
-	fill: #808080;
-}
-.positiveCircle
-{
-	fill: #FFFF67;
-}
-.negativeCircle
-{
-	fill: #3476CD;
+	font: sans-serif;
 }

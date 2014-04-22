@@ -1,6 +1,7 @@
 var econData, qualityData, econStoriesData, wordData = {}, 
     currentSelection = "danceability",
-    sortOrder = 'desc';
+    sortOrder = 'desc',
+    lyricDetailsSelection = "pos";
 
 var margin = {top: 10, right: 15, bottom: 100, left: 40},
     margin2 = {top: 430, right: 10, bottom: 20, left: 40},
@@ -8,8 +9,17 @@ var margin = {top: 10, right: 15, bottom: 100, left: 40},
     height = 500 - margin.top - margin.bottom,
     height2 = 500 - margin2.top - margin2.bottom,
     musicQualHeight = 300,
-    musicQualWidth = 70;
-    musicQualRectWidth = 20;
+    musicQualWidth = 70,
+    musicQualRectWidth = 30,
+    defaultTextSize = 8,
+    posSize = defaultTextSize,
+    negSize = defaultTextSize,
+    bodSize = defaultTextSize,
+    vioSize = defaultTextSize,
+    relaSize = defaultTextSize,
+    reliSize = defaultTextSize,
+    colorSize = defaultTextSize,
+    moneySize = defaultTextSize,
     lyricsWidth = (1024 - musicQualWidth - 300) / 5; // 300 here is space allocated for the lyrics details
 
 var parseDate = d3.time.format("%m/%e/%Y").parse;
@@ -22,7 +32,7 @@ var x = d3.time.scale().range([0, width-margin.right]),
     y3 = d3.scale.linear().range([height, 0]),
     qualScale = d3.scale.linear().range([500,0]).domain([0,1]),
     qualScale2 = d3.scale.linear().range([0,70]).domain([0,1]),
-    circleScale = d3.scale.linear().range([0,10]);
+    lyricScale = d3.scale.linear().range([8,24]); // pt scale
 
 // set up axis scales
 var xAxis = d3.svg.axis().scale(x).orient("bottom"),
@@ -82,52 +92,34 @@ var moodAveGraph = d3.select("#moodAve").append("svg")
     .attr("width", musicQualWidth)
     .attr("height", musicQualHeight);
 
-var moneyCircle = d3.select("#moneyCount").append("svg")
-    .attr("width", lyricsWidth)
-    .attr("height", musicQualHeight);
+// "pos", "neg", "bod", "vio", "rela", "color", "reli"
 
-var posEmoteCircle = d3.select("#posEmoteCount").append("svg")
-    .attr("width", lyricsWidth)
-    .attr("height", musicQualHeight);
+var posText = d3.select("#pos")
+    .style("font-size", posSize + "pt");
+    
+var negText = d3.select("#neg")
+    .style("font-size", negSize + "pt");   
 
-var posOutCircle = d3.select("#posOutCount").append("svg")
-    .attr("width", lyricsWidth)
-    .attr("height", musicQualHeight);
+var bodText = d3.select("#bod")
+    .style("font-size", bodSize + "pt");   
 
-var negEmoteCircle = d3.select("#negEmoteCount").append("svg")
-    .attr("width", lyricsWidth)
-    .attr("height", musicQualHeight);
+var vioText = d3.select("#vio")
+    .style("font-size", vioSize + "pt");   
 
-var negOutCircle = d3.select("#negOutCount").append("svg")
-    .attr("width", lyricsWidth)
-    .attr("height", musicQualHeight);
+var relaText = d3.select("#rela")
+    .style("font-size", relaSize + "pt");   
 
-/* the following few lines are just for viz test but not interactive */
-moneyCircle.append("circle")
-    .attr("r",25)
-    .attr("transform", "translate(60,60)")
-    .attr("class","moneyCircle");
+var colorText = d3.select("#color")
+    .style("font-size", colorSize + "pt");   
 
-posEmoteCircle.append("circle")
-    .attr("r",30)
-    .attr("transform", "translate(60,60)")
-    .attr("class","positiveCircle");
+var reliText = d3.select("#reli")
+    .style("font-size", reliSize + "pt");   
 
-posOutCircle.append("circle")
-    .attr("r",40)
-    .attr("transform", "translate(60,60)")
-    .attr("class","positiveCircle");
+var moneyText = d3.select("#money")
+    .style("font-size", moneySize + "pt");     
 
-negEmoteCircle.append("circle")
-    .attr("r",30)
-    .attr("transform", "translate(60,60)")
-    .attr("class","negativeCircle");
 
-negOutCircle.append("circle")
-    .attr("r",40)
-    .attr("transform", "translate(60,60)")
-    .attr("class","negativeCircle");
-
+                                                    
 /*********************************************************************/
 
 d3.csv("./data/econ_data.csv", econType, function(error, data)
@@ -189,17 +181,10 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
     {
       econStoriesData = data3;
 
-      d3.json("./data/wordbags-group1.json", function(data4) 
+      d3.json("./data/trackMap.json", function(data4) 
       {
-        for (var i = 0; i < data4[0].words.length; i++)
-        {
-          var d = data4[0].words[i];
+        wordData = d3.map(data4);
 
-          if (d.track != null && d.sum != null && d.det != null)
-          {
-            wordData[d.track] = {counts:d.sum, words:d.det};
-          }
-        }
 
         var danceHeight = qualScale(d3.mean(data2.map(function(d) { return d.danceability; })));
         var energyHeight = qualScale(d3.mean(data2.map(function(d) { return d.energy; })));
@@ -255,6 +240,64 @@ function brushed() {
   var danceHeight = qualScale(d3.mean(filterArray(qualityData,"danceability","date")));
   var energyHeight = qualScale(d3.mean(filterArray(qualityData,"energy","date")));
   var moodHeight = qualScale(d3.mean(filterArray(qualityData,"mood","date")));
+
+  // loop through categories
+  var groupSummary = {};
+  var trackData = getTrackSet(qualityData, "date"); // get track set just once
+
+  groups = ["pos", "neg", "bod", "vio", "rela", "color", "reli", "money"];
+  var totals = [];
+  groups.forEach(function(group) {
+    groupSummary[group] = filterLyricsArray(trackData, group);
+    totals.push(d3.mean(groupSummary[group]));
+  });
+
+
+  lyricScale.domain(d3.extent(totals));
+  var posSize = lyricScale(d3.mean(groupSummary["pos"]));
+  var negSize = lyricScale(d3.mean(groupSummary["neg"]));
+  var bodSize = lyricScale(d3.mean(groupSummary["bod"]));
+  var vioSize = lyricScale(d3.mean(groupSummary["vio"]));
+  var relaSize = lyricScale(d3.mean(groupSummary["rela"]));
+  var colorSize = lyricScale(d3.mean(groupSummary["color"]));
+  var reliSize = lyricScale(d3.mean(groupSummary["reli"]));
+  var moneySize = lyricScale(d3.mean(groupSummary["money"]));
+
+  // update details
+  populateLyricsDetail(trackData, lyricDetailsSelection);
+
+  posText.style("font-size", posSize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "pos");
+  });
+  negText.style("font-size", negSize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "neg");
+  });
+  bodText.style("font-size", bodSize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "bod");
+  });
+  vioText.style("font-size", vioSize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "vio");
+  });
+  relaText.style("font-size", relaSize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "rela");
+  });
+  colorText.style("font-size", colorSize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "color");
+  });
+  reliText.style("font-size", reliSize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "reli");
+  });
+  moneyText.style("font-size", moneySize + "pt")
+    .on("click", function(){
+      populateLyricsDetail(trackData, "money");
+  });
 
   danceAveGraph.select(".musicQualDance")
     .attr("height", danceHeight)
@@ -360,10 +403,102 @@ function filterArray(array,valueProperty,dateProperty)
 
     if ((thisDate >= minDate && thisDate <= maxDate) || minDate.getTime()  === maxDate.getTime())
         returnArray.push(d[valueProperty]);
+        
   }
 
   return returnArray;
 }
+
+function getTrackSet(array,dateProperty)
+{
+  var trackArray = [];
+  var minDate = brush.extent()[0];
+  var maxDate = brush.extent()[1];
+  
+  // get list of track IDs for this date range
+  for (var i = 0; i < array.length; i++)
+  {
+    var d = array[i];
+    var thisDate = d[dateProperty];
+
+    if ((thisDate >= minDate && thisDate <= maxDate) || minDate.getTime()  === maxDate.getTime())
+        trackArray.push(d["track_id"]);
+        
+  }
+ 
+  return trackArray;
+
+ }
+
+ function filterLyricsArray(tracks, group) {
+  var returnArray = [];
+
+  tracks.forEach(function(track){
+    if (wordData.has(track)) {
+      var vals = wordData.get(track);
+      vals.forEach(function(v) { 
+        if (v[0].grp == group) {
+          returnArray.push(+v[0].sum);
+        }
+      });
+    }
+  });
+  return returnArray;
+ }
+
+function populateLyricsDetail(tracks, group)
+{
+  var stemData = d3.map();
+  var cnt = 0;
+
+  lyricDetailsSelection = group;
+  // turn all off first
+  d3.selectAll("#lyricQualities td").classed("lit", false)
+  // now turn this one on
+  d3.select("#" + group).classed("lit", true);
+
+  // retrieve the track from wordData if it's there
+  tracks.forEach(function(track){
+    if (wordData.has(track)) {
+      var vals = wordData.get(track);
+      // look for the group
+      vals.forEach(function(v) { 
+        if (v[0].grp == group) {
+          // get stems
+          var stems = v[0].stems;
+          // go thru stems array 
+          // each stemObj has stem, cnt
+          stems.forEach(function(stemObj){
+            if (stemData.has(stemObj.stem)) {
+              // update its count
+              cnt = stemData.get(stemObj.stem) + stemObj.cnt;
+              stemData.set(stemObj.stem, cnt);
+            }
+            else {
+              // create it
+              stemData.set(stemObj.stem, stemObj.cnt);
+            }
+          }); // end stems
+        }
+      }); // end vals
+    }
+  }); // end tracks
+
+  formatLyricsDetail(stemData);
+  }
+
+// ===========================================================
+function formatLyricsDetail(stemMap) {
+  var lyricsHTML = "<ul>";
+
+  stemMap.forEach(function(stem, cnt) {
+    lyricsHTML += "<li>" + stem + " (" + cnt + ")</li>";
+  });
+
+  lyricsHTML += "</ul>"
+  d3.select("#lyricDetails").html(lyricsHTML);
+}
+
 
 function sortByProperty(array, valueProperty)
 {
