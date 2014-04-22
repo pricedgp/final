@@ -4,7 +4,6 @@
     <title>Lyrics Script</title>
 
     <script src="./libs/d3.v3.min.js"></script>
-    <!--script src="./libs/lyricsNew.js"></script -->
     <script src="./libs/FileSaver.js"></script>
     <script src="./libs/jquery-1.10.1.js"></script>
     <script src="./libs/jquery.csv-0.71.js"></script>
@@ -17,282 +16,123 @@
 
 <script type="text/javascript">
 
-var lyricsWeWant;
-
-var lyricGroups;
-var trackData;
-var trackMap;
-var categories = [];
 
 // ------------------------------------------------------------------------------------
-// data files should be in ./data/
-
-// var MXM_DATASET = "mxm_500.txt";              // small sample word/count file
-var MXM_DATASET = "mxm_all.txt";            // main word/count file
-// var MXM_DATASET = "mxm_sample.txt";         // test word/count file
-
-var LYRICGROUPS = "lyricGroups.json";       // how we're grouping words
-
-// var TRACKFILE = "whitburnTracks-sample.csv";// very small sample -- tracks we're processing
-var TRACKFILE = "final_tracks.csv";     // the "real" tracks we want to process
-// var TRACKFILE = "tracks_only-First Reduction.csv";// tracks we're processing
-
-var TRACKIDFILE = "mxm_all_trackids.txt"; // track ids from full mxm set
-// --------------------------------------------------------------------------------------
-
-
-/*
-Files needed (manual step): 
-  topWordsInOrder.tsv
-  stemGroupings.csv
-  mxm_sample.txt (for testing -- 500 rows) -- use mxm_full.txt for real
-
-Purpose: Create a file that contains the key, stem and group
-of each word stem listed in the selectedStems.csv file.
-The selectedStems.csv file is manually created. It contains
-an arbitrary number of word stem / group pairs, like so:
-
-gray,EmotionNegative
-satisfact,EmotionPositive
-prize,MoneyHave
-free,OutlookPositive
-
-Loop through that file, getting the key from topWordsInOrder.txt,
-which was manually extracted from the Echo Nest train file 
-(retrieved at http://labrosa.ee.columbia.edu/millionsong/musixmatch).
-To extract, take the first row of that file (it's 5000 words), save
-it as topWords.txt, and then run the following bash command:
-cat topWords.txt | sed s/,/\\n/g > topWordsInOrder.txt
-
-*/
-// ==========================================
-/* Populates categories; depends on lyricGroups.
-To make life simpler, this function gets the list of
-unique groups ("buckets") that are used to classify the
-terms we search.
-*/
-
-// ---------- for generating lyricGroups ------------------
-// 
-
-
-
-console.log("entering getCategories");
-
-d3.json("./data/" + LYRICGROUPS, function(text) {
-
-
-  lyricGroups = text;
-
-lyricGroups.forEach(function(item) {
-  if (categories.indexOf(item.group) < 0) {// if not already there
-    categories.push(item.group);
-  }
-});
-
-loadTrackData();
-
-//temp
-// testMap();
-
-});
-
-// =============================================
-/* loads trackMap
-  This object is loaded from a file containing all of the track-word
-  data obtained from Echo Nest. That file is a manual concatenation of the train
-  and test files (minus the first row in each, which is the word data)
-
-  NOTE: The full file is 113MB -- this function takes 30 minutes to run on
-  a client with 4GB of RAM. 
-
-*/
-      /*
-      Problem is that in full dataset, there are 237K records, and each
-      record may have an array between 20 and 100 in length. So we need to
-      reduce this file to include only the track IDs we want (from final_tracks.csv)
-      Loading the text file is fast, so we can do that, and then loop through
-      the final_tracks.csv and find that track. If found, append it to 
-      a file. 
-      */
-
-function loadTrackData() {
-console.log("entering loadTrackData");
-
-  var myRows;
-  /*
+var MXM_DATASET = "mxmReduced.json";        // main word/count file
+ /*
   Each row looks like this:
-  /*
     0: "TRAAAAV128F421A322"
     1: "4623710"
     2: "1:6"
     3: "2:4"
     where first item in colon-separated string is a key, second is count
     the key points to the word stem in the mxm file
-*/
-    // mxm_sample.txt contains 500 rows
-    // the real file contains 237,000 rows
-    d3.text("./data/" + MXM_DATASET, function(text) {
-      
-      myRows = d3.csv.parseRows(text);
+  */
+var LYRICGROUPS = "lyricsReference.json";       // how we're grouping words
+// --------------------------------------------------------------------------------------
 
-      trackMap = d3.map(); 
+var trackMap = d3.map();
 
-      // create map -- will need to access later by trackId
-      // create trackId as key, and values[{"stemID": xx, "count": xx}]
-      var splitStr = [];
-      var trackId; 
-      var trackCount = {};
-      myRows.forEach(function(row) {
-        var values = [];
-        // elements in the row array:
-        row.forEach(function(element, i) {
+main();
+
+
+function main() {
+
+  var mxmData;
+  
+  d3.json("./data/" + MXM_DATASET, function(data1) {
+
+    mxmData = data1;
+
+    d3.json("./data/" + LYRICGROUPS, function(data2) {
+
+      lyricGroups = d3.map(data2);
+
+      // loop through each group and get counts/words for each track
+      processTracks(mxmData, lyricGroups);
+
+      saveToFile(trackMap, "trackMap.json");
+
+
+      });
+  });
+}
+
+function processTracks(mxm, groups) {
+
+var stemId, stemCount, trackId, splitStr;
+
+  mxm.forEach(function(track) {
+      // loop through each element in track
+      track.forEach(function(element, i) {
           if (i == 0) {
             trackId = element; // first element is MSD track ID
           }
           if (i > 1) { // skip the keys (0, 1)
+            // process the stem/count pair
             splitStr = element.split(":"); 
-            trackCount = {"id": splitStr[0], "cnt": splitStr[1]};
-            values.push(trackCount);
+            stemId = splitStr[0];
+            stemCount = splitStr[1];
+            // check groups
+            countGroup(trackId, stemId, stemCount, groups);
+
           }
-        }); // finished with element -- add to map
-        trackMap.set(trackId, values);
+      }); 
+  });
 
-      }); // next row
+}
 
+  function countGroup(trackId, stemId, stemCount, groups) {
 
-      getWordBags();
-
+    groups.forEach(function(key, stemArray) {
+      stemArray.forEach(function(d){
+        //d.id, d.stem
+        if (d.id == stemId) {
+          updateTrackMap(trackId, stemId, stemCount, key, d.stem)
+        }
+      });
     });
-
   }
 
 
+function updateTrackMap(trackId, stemId, stemCount, group, stem) {
+  var values = [];
+  var hasGroup = false;
+  // create if doesn't exist in map
+  if (!trackMap.has(trackId)) {
+    trackMap.set(trackId, values); 
+  }
+  // get values
+  values = trackMap.get(trackId);
+  // might be empty, partially filled, etc.
+  // var vMap = d3.map(values);
+  values.forEach(function(v) {
+    if (v[0].grp != undefined && v[0].grp == group) {
+      hasGroup = true;
+    }
+  });
 
-// =============================================
-/*
-Returns a WordBag object, which consists of:
-Summary: Array of GroupCount objects {"group": groupName, "count": totalCount}
-Details: Array of WordDetail object {"stem": wordStem, "count": stemCount}
-/*
-Input: csv file with track IDs and our internal IDs
-
-*/
-
-function getWordBags() {
-    var WordBag = [];
-    var StemCount;
-    var Summary = [];
-    var Details = [];
-    var Output = [];
-    var trackObject;
-    var GroupCount = d3.map();
-    var count = 0;
-
-    /* get the tracks file (contains the ids of only those tracks
-        that will be part of the viz -- should ONLY contain 
-        track IDs, one per row)
-    */
-    console.log("entering getWordBags");
-
-    d3.text("./data/" + TRACKFILE, function(text) {
-      
-        tracks = d3.csv.parseRows(text);
-
-        // initialize GroupCount map, setting all counts to 0
-        categories.forEach(function(item) {
-            GroupCount.set(item, count);
-        });
-
-        // ============= main loop ========================
-        console.log("Processing " + TRACKFILE);
-        var i = 0;
-        var seq = 1; // file sequence
-        tracks.forEach(function(track) {
-          i++;
-            console.log("Track " + track);
-
-
-            // get trackMap object for this track
-            trackObject = trackMap.get(track);
-            if (trackObject == undefined) {
-                // set it to empty
-                trackObject = [];
-                console.log("TrackId " + track + " not found!");
-            }
-
-              /* populate WordDetail objects -- go through lyricGroups
-              {"key": item, "word": e.stem, "group": e.group}, and
-              for each object, get its key and compare that to the stemID
-              in the trackObject
-              {"stemID": splitStr[0], "count": splitStr[1]}. 
-              If it exists, get the count. If it doesn't exist, set the count to 0.
-              Add that WordDetail object to the Detail array.
-
-              populate GroupCount object -- in same loop, update the GroupCount map -- 
-              find the key/value pair using the group as key -- update the value by
-              adding the count to it. Add that GroupCount object to the Summary array
-              */
-            lyricGroups.forEach(function(lg) {
-                // trackObject is array with count for every stem
-                // we want to filter so we only have counts for the stems we want
-                trackObject.forEach(function(stemCount) {
-                    if (lg.key == stemCount.id) {
-                        count = +stemCount.cnt; 
-                        StemCount = {"id": lg.word, "cnt": count};
-                        if (count > 0) {
-                            console.log("\t" + lg.word + ": " + count + " (id: " + lg.key + ")");
-                        }
-                        Details.push(StemCount);
-                    }
-                    else {
-                        count = 0;
-                    }
-                    // Summary
-                    gc = GroupCount.get(lg.group);
-                    groupCount = gc + count; // increment count for this group
-                    GroupCount.set(lg.group, groupCount);
-                });
-
-            });
-            // finish the track
-            Summary.push(GroupCount.values()); // includes key + count for each
-
-            WordBag.push({"track": track[0], "sum": Summary, "det": Details});
-            // specify the group ID (i.e., what group of words are we counting)
-            // WordBag.push({"track": track[0], "g1": Summary});
-
-            // reset for next track
-            GroupCount.forEach(function(k, v) {
-                GroupCount.set(k, 0);
-            });
-            Summary = [];
-            Details = [];
-
-            if (i == 1000) { // test with 1000 first
-              // put categories in the output
-              Output.push({"categories": categories, "words": WordBag});
-              // output the file
-              saveToFile(Output, "wordbags-" + seq + ".json");
-              // reset the count
-              i= 0;
-              // increment file sequence
-              seq++;
-              // reset the file output
-              Output = [];
-              // reset WordBag
-              WordBag = [];
-            }
-
-        }); // end of tracks loop
-
-        // save it
-        Output.push({"categories": categories, "words": WordBag});
-        saveToFile(Output, "wordbags-" + seq+1 + ".json"); // gets remainder
-        WordBag = [];
+  var gValues = [];
+  if (!hasGroup) {
+    // initialize the group
+    gValues.push({"grp": group, "sum": +stemCount, "stems": [{"stem": stem, "cnt": +stemCount}]});
+    values.push(gValues);
+  }
+  else {
+    // group exists -- update it
+    values.forEach(function(v) {
+      if (v[0].grp != undefined && v[0].grp == group) {
+        v[0].sum = v[0].sum + (+stemCount);
+        v[0].stems.push({"stem": stem, "cnt": +stemCount});
+      }
     });
+  }
+  // set the trackMap with all this crap
+  trackMap.set(trackId, values);
 
 }
+
+
 
 // ===============================================
   var saveToFile = function(object, filename){
@@ -303,222 +143,8 @@ function getWordBags() {
           type: "text/plain;charset=utf-8"
       });
       saveAs(blob, filename);
-      printTotals(object, filename);
+      // printTotals(object, filename);
   }
-
-
-// ==============================================
-  function printTotals(output, filename) {
-
-    total = [];
-    output[0].words.forEach(function(track) {
-        summary = track.sum;
-        summary[0].forEach(function(count, i) {
-            if (count > 0) {
-                console.log(categories[i] + ": " + count);
-            }
-            if (total[i] == undefined) {
-                total[i] = (+count);
-            }
-            else {
-                total[i] = total[i] + (+count);
-            }
-
-        });
-    });
-    console.log("========== Totals for File Seq " + filename + " ============")
-    total.forEach(function(t, i) {
-        console.log(categories[i] + ": " + t)
-    })
-
-  }
-
-
-// ==============================================================================
-
-
-// ==========================================
-function createLyricReference() {
-  console.log("entering createLyricReference");
-// creates the lyricGroups.csv file
-
-// (must manually copy from downloads directory into data)
-// Prerequisite: topWordsInOrder.csv must exist
-
-  var data;
-  var lyricsData;
-  var lyricMap;
-  
-  // populate lyricsWeWant
-  getStemGroups();
-  
-  // 5000 words in this file
-  // position is the key to each stem
-  //d3.tsv("./data/topWordsInOrder.csv", function(error, data) {
-
-
-
-d3.tsv("./data/topWordsInOrder.tsv", function(error, data) {
-    lyricsData = data;
-          
-      // do something if needed
-    // manually create a map
-    // 
-    lyricMap = d3.map();
-    lyricsData.forEach(function(e) {
-    // the word stem is the key (1st param), the position/rank is the value (2nd)
-      lyricMap.set(e.stem, e.key);
-    });
-
-   var item, idx;
-     var lyricGroup = {};
-     var myArray = [];
-
-    lyricsWeWant.forEach(function (e) {
-      if ( lyricMap.get(e.stem) ) {
-        // find key using stem
-        item = lyricMap.get(e.stem);
-        lyricGroup = {"key": +item, "word": e.stem, "group": e.group};
-
-        myArray.push(lyricGroup);
-      }
-    });
-
-    console.log(myArray.length);
-    saveToFile(myArray, "lyricGroups.json");
-     
-   
-  });
- 
-};
-
-
-// ==========================================
-function getStemGroups() {
-  console.log("entering getStemGroups");
-
-  d3.text("./data/" + STEMGROUP, function(text) {
-
-    lyricsWeWant = d3.csv.parseRows(text);
-    
-    createLyricReference();
-          
-      // do something if needed
-    });
- 
-  };
-
-
-
-
-// ==========================================================================
-
-function testMap() {
-
-      // mxm_sample.txt contains 500 rows
-    // the real file contains 237,000 rows
-    d3.text("./data/" + TRACKIDFILE, function(text) {
-      
-      allTrackIds = d3.csv.parseRows(text);
-      var aMap = d3.map();
-
-      // make it a map, I guess
-      allTrackIds.forEach(function(t) {
-        aMap.set(t, t); // key and value are the same
-      });
-
-      preLoadTrackData(aMap);
-
-      console.log("done");
-
-    });
-}
-
-
-
-function preLoadTrackData(aMap) {
-console.log("entering preLoadTrackData");
-
-    d3.text("./data/" + TRACKFILE, function(text) {
-      
-        tracks = d3.csv.parseRows(text);
-
-        outputTracks(tracks, aMap);
-
-      });
-  }
-
-
-
-/*
-tracks = tracks we want (charted tracks)
-allTrackIds = ids of all mxm tracks (charted or not)
-we need to find the index of the tracks we want and then
-get them from the full 237K data set (mxm_all)
-*/
-function outputTracks(tracks, aMap) {
-
-   var myRows;
-  /*
-  Each row looks like this:
-  /*
-    0: "TRAAAAV128F421A322"
-    1: "4623710"
-    2: "1:6"
-    3: "2:4"
-    where first item in colon-separated string is a key, second is count
-    the key points to the word stem in the mxm file
-*/
-    // mxm_sample.txt contains 500 rows
-    // the real file contains 237,000 rows
-    d3.text("./data/" + MXM_DATASET, function(text) {
-      
-      data = d3.csv.parseRows(text);
-
-      trackMap = d3.map(); 
-
-      var final_tracks = [];
-      var trackId; 
-      var trackCount = {};
-      var idx;
-
-      // loop through the tracks we want
-      tracks.forEach(function(track) {
-        // get index from the "id-only" file
-        item = aMap.get(track);
-        final_tracks.push(item);
-
-      });
-
-      // do something with final_tracks
-
-      saveArrayToFile(final_tracks, "someFile");
-
-    });
-
-  }
-
-    var saveArrayToFile = function(arrayOfLines, fileName) {
-     /* adds linebreaks at the end*/
-     var blob, blobText;
-     blobText = arrayOfLines.map(function(d) {
-       if (d.endsWith("\n")) {
-         return d;
-       } else {
-         return d + "\n";
-       }
-     });
-     blob = new Blob(blobText, {
-       type: "text/plain;charset=utf-8"
-     });
-     return saveAs(blob, fileName);
-   };
-
-   String.prototype.endsWith = function(suffix) {
-     return this.indexOf(suffix, this.length - suffix.length) !== -1;
-   };
-
-
 
 
 </script>

@@ -20,6 +20,7 @@
 var lyricsWeWant;
 
 var lyricGroups;
+var lyricsReference = [];
 var trackData;
 var trackMap;
 var categories = [];
@@ -27,27 +28,25 @@ var categories = [];
 // ------------------------------------------------------------------------------------
 // data files should be in ./data/
 
-var STEMGROUP = "stemGroupings-emo.csv";      // used to derive lyricgroups
+var STEMGROUP = "stemGroupingsNew.csv";      // used to derive lyricgroups
 
 
-
-// ==========================================
-/* Populates categories; depends on lyricGroups.
-To make life simpler, this function gets the list of
-unique groups ("buckets") that are used to classify the
-terms we search.
-*/
-
-// ---------- for generating lyricGroups ------------------
-// 
-
-  console.log("entering getStemGroups");
+ // 5000 words in this file
+  // key, stem, group
+  /*
+  We have to remove ones without groups
+  and put the others into groups
+  category: xxx; stems: [n..n]
+  */
 
   d3.text("./data/" + STEMGROUP, function(text) {
 
-    lyricsWeWant = d3.csv.parse(text);
+    allStems = d3.csv.parse(text);
     
-    createLyricReference();
+    stemMap = createLyricReference(allStems);
+
+
+    // saveToFile(stemMap, "lyricsReference.json");
           
     });
  
@@ -56,54 +55,48 @@ terms we search.
 
 
 // ==========================================
-function createLyricReference() {
-  console.log("entering createLyricReference");
-// creates the lyricGroups.csv file
+function createLyricReference(allStems) {
+  var stemArray = [];
+  var stemMap = d3.map();
 
-// (must manually copy from downloads directory into data)
-// Prerequisite: topWordsInOrder.csv must exist
 
-  var data;
-  var lyricsData;
-  var lyricMap;
-  
+// (must manually copy from downloads directory into data once done)
 
-  // 5000 words in this file
-  // position is the key to each stem
-  //d3.tsv("./data/topWordsInOrder.csv", function(error, data) {
-
-d3.text("./data/topWordsInOrder.tsv", function(text) {
-
-    lyricsData = d3.tsv.parse(text);
-          
-      // do something if needed
-    // manually create a map
-    // 
-    lyricMap = d3.map();
-    lyricsData.forEach(function(e) {
-    // the word stem is the key (1st param), the position/rank is the value (2nd)
-      lyricMap.set(e.stem, e.key);
-    });
-
-   var item, idx;
-     var lyricGroup = {};
-     var myArray = [];
-
-    lyricsWeWant.forEach(function (e) {
-      if ( lyricMap.get(e.stem) ) {
-        // find key using stem
-        item = lyricMap.get(e.stem);
-        lyricGroup = {"key": +item, "word": e.stem, "group": e.group};
-
-        myArray.push(lyricGroup);
-      }
-    });
-
-    console.log(myArray.length);
-    saveToFile(myArray, "lyricGroups.json");
-     
-   
+// sort the array
+allStems.sort(function (a,b) {
+    if (a.group > b.group) {
+        return 1;
+    }
+    else if (a.group < b.group) {
+      return -1;
+    }
+    else {
+      return 0;
+    }
   });
+
+currentGroup = allStems[0].group; // get first
+
+allStems.forEach(function(row){
+
+  if (row.group == currentGroup) {
+    // add stems to array
+    stemArray.push({"id": row.key, "stem": row.stem});
+  }
+  else {
+    if (currentGroup != "") {
+      stemMap.set(currentGroup, stemArray);
+    }
+    stemArray = []; // clear array
+    stemArray.push({"id": row.key, "stem": row.stem});
+    currentGroup = row.group; // next group
+  }
+});
+
+console.log("Done");
+return stemMap;
+
+
  
 }
 

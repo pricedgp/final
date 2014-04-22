@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Save Union Utility</title>
+
+    <script src="./libs/d3.v3.min.js"></script>
+    <!--script src="./libs/lyricsNew.js"></script -->
+    <script src="./libs/FileSaver.js"></script>
+
+
+</head>
+<body>
+
+<script type="text/javascript">
+
+/*
+Use this utility to pare down the universe of track IDs. 
+We will compare the full set of Whitburn track IDs to the full set
+of MXM track IDs. We will save off only those track IDs that are
+in both files. These represent the tracks for which we can 
+produce word counts. 
+
+You really only need to do this once. 
+
+Current results show 3810 rows. 
+
+Saved to "lyricTrackIds.csv"
+
+*/
+// ------------------------------------------------------------------------------------
+// var TRACKFILE = "whitburnTracks-sample.csv";// very small sample -- tracks we're processing
+var WHITBURN_FULL_TRACKFILE = "final_tracks.csv";     // the "real" tracks we want to process
+
+var MXM_FULL_TRACKFILE = "mxm_all_trackids.csv"; // track ids from full mxm set
+// --------------------------------------------------------------------------------------
+
+main();
+
+
+function main() {
+
+    var finalArray = [];
+    d3.text("./data/" + MXM_FULL_TRACKFILE, function(data1) {
+      
+      mxmTrackIds = d3.csv.parseRows(data1);
+
+      d3.text("./data/" + WHITBURN_FULL_TRACKFILE, function(data2) {
+
+        whitTrackIds = d3.csv.parseRows(data2);
+
+        finalArray = reduce(mxmTrackIds, whitTrackIds);
+
+        saveArrayToFile(finalArray, "lyricTrackIds.csv");
+
+      });
+    });
+  }
+
+
+function reduce(mxm, whit) {
+  var returnArray = [];
+
+    mxm[0].forEach(function(d) {
+      if (whit[0].indexOf(d) > 0) 
+      {
+        returnArray.push(d);
+      }
+    });
+
+    return returnArray;
+}
+
+    var saveArrayToFile = function(arrayOfLines, fileName) {
+     /* adds linebreaks at the end*/
+     var blob, blobText;
+     blobText = arrayOfLines.map(function(d) {
+       if (d.endsWith("\n")) {
+         return d;
+       } else {
+         return d + "\n";
+       }
+     });
+     blob = new Blob(blobText, {
+       type: "text/plain;charset=utf-8"
+     });
+     return saveAs(blob, fileName);
+   };
+
+   String.prototype.endsWith = function(suffix) {
+     return this.indexOf(suffix, this.length - suffix.length) !== -1;
+   };
+
+
+
+
+</script>
+</body>
+</html>

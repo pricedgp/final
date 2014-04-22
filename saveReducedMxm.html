@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Save Reduced Mxm Utility</title>
+
+    <script src="./libs/d3.v3.min.js"></script>
+    <script src="./libs/FileSaver.js"></script>
+
+
+</head>
+<body>
+
+<script type="text/javascript">
+
+/*
+Use this utility to pare down the universe of track data
+contained in the MXM dataset (which contains 237K records). 
+
+This should pare it down to 3810 records.
+
+We will create a file that only contains the records with
+track IDs that exist in the "lyricTrackIds.csv" file. That file
+is created by saveUnionTrackIds.html.
+
+You really only need to do this once. 
+
+Saved to finalMxmData.csv. 
+
+
+*/
+// ------------------------------------------------------------------------------------
+var MXM_FULL_DATASET = "mxm_all.txt";           // full mxm data file
+var REDUCED_TRACKFILE = "lyricTrackIds.csv";    // track Ids of track data we want 
+// --------------------------------------------------------------------------------------
+
+main();
+
+
+function main() {
+
+    var finalMxmArray = [];
+    d3.text("./data/" + MXM_FULL_DATASET, function(data1) {
+      
+      mxmTrackData = d3.csv.parseRows(data1);
+
+      d3.text("./data/" + REDUCED_TRACKFILE, function(data2) {
+
+        whitTrackIds = d3.csv.parseRows(data2);
+
+        finalMxmArray = reduce(mxmTrackData, whitTrackIds);
+
+        saveToFile(finalMxmArray, "mxmReduced.json");
+
+      });
+    });
+  }
+
+
+function reduce(mxm, whit) {
+  var returnArray = [];
+
+    mxm.forEach(function(d) {
+      if (whit[0].indexOf(d[0]) > 0) 
+      {
+        returnArray.push(d);
+      }
+    });
+
+    return returnArray;
+}
+
+// ===============================================
+  var saveToFile = function(object, filename){
+
+      var blob, blobText;
+      blobText = [JSON.stringify(object, '\t')];
+      blob = new Blob(blobText, {
+          type: "text/plain;charset=utf-8"
+      });
+      saveAs(blob, filename);
+     
+  }
+
+
+
+</script>
+</body>
+</html>
