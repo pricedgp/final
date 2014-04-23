@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lyrics Script</title>
+    <title>Create TrackMap for Viz</title>
 
     <script src="./libs/d3.v3.min.js"></script>
     <script src="./libs/FileSaver.js"></script>
-    <script src="./libs/jquery-1.10.1.js"></script>
-    <script src="./libs/jquery.csv-0.71.js"></script>
-
-
 
 
 </head>
@@ -16,7 +12,10 @@
 
 <script type="text/javascript">
 
-
+// ---------------------------------
+/*
+Creates the output file that's used in the viz ("trackMap.json"). 
+*/
 // ------------------------------------------------------------------------------------
 var MXM_DATASET = "mxmReduced.json";        // main word/count file
  /*
@@ -28,6 +27,7 @@ var MXM_DATASET = "mxmReduced.json";        // main word/count file
     where first item in colon-separated string is a key, second is count
     the key points to the word stem in the mxm file
   */
+// How we're grouping words; created by   
 var LYRICGROUPS = "lyricsReference.json";       // how we're grouping words
 // --------------------------------------------------------------------------------------
 

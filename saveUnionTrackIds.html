@@ -4,7 +4,6 @@
     <title>Save Union Utility</title>
 
     <script src="./libs/d3.v3.min.js"></script>
-    <!--script src="./libs/lyricsNew.js"></script -->
     <script src="./libs/FileSaver.js"></script>
 
 
@@ -26,9 +25,12 @@ Current results show 3810 rows.
 
 Saved to "lyricTrackIds.csv"
 
+NOTE: You'll have to modify this file -- you want a single line of comma-separated track IDs,
+but this produces a single line per track ID. So just search/replace.
+
 */
 // ------------------------------------------------------------------------------------
-// var TRACKFILE = "whitburnTracks-sample.csv";// very small sample -- tracks we're processing
+
 var WHITBURN_FULL_TRACKFILE = "final_tracks.csv";     // the "real" tracks we want to process
 
 var MXM_FULL_TRACKFILE = "mxm_all_trackids.csv"; // track ids from full mxm set

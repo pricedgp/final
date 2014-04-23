@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lyrics Script</title>
+    <title>Create Lyrics Reference</title>
 
     <script src="./libs/d3.v3.min.js"></script>
-    <!--script src="./libs/lyricsNew.js"></script -->
     <script src="./libs/FileSaver.js"></script>
-    <script src="./libs/jquery-1.10.1.js"></script>
-    <script src="./libs/jquery.csv-0.71.js"></script>
-
-
 
 
 </head>
@@ -17,27 +12,26 @@
 
 <script type="text/javascript">
 
-var lyricsWeWant;
 
-var lyricGroups;
-var lyricsReference = [];
-var trackData;
-var trackMap;
-var categories = [];
+/*
 
-// ------------------------------------------------------------------------------------
-// data files should be in ./data/
+Use this to put the word stems into groups. It starts with the
+"stemGroupingsNew.csv" file. This file is created from a spreadsheet 
+that's manually edited. The spreadsheet contains the 5000 word stems, 
+and you simply edit it and assign groups to the stems. 
 
-var STEMGROUP = "stemGroupingsNew.csv";      // used to derive lyricgroups
+Output to "lyricsReference.json". Note that you must edit that
+file to remove the \u0000 (nul characters) which the saveToFile
+function seems to put in there when the object is a map. Just do
+a search/replace. 
+*/
 
+var stemMap = d3.map();
+var allStems;
 
- // 5000 words in this file
-  // key, stem, group
-  /*
-  We have to remove ones without groups
-  and put the others into groups
-  category: xxx; stems: [n..n]
-  */
+// ------------------------------------------------------
+var STEMGROUP = "stemGroupingsNew.csv";      
+// ------------------------------------------------------
 
   d3.text("./data/" + STEMGROUP, function(text) {
 
@@ -45,59 +39,59 @@ var STEMGROUP = "stemGroupingsNew.csv";      // used to derive lyricgroups
     
     stemMap = createLyricReference(allStems);
 
-
-    // saveToFile(stemMap, "lyricsReference.json");
+    saveToFile(stemMap, "lyricsReference.json");
           
     });
  
-  
-
-
 
 // ==========================================
 function createLyricReference(allStems) {
   var stemArray = [];
-  var stemMap = d3.map();
-
-
-// (must manually copy from downloads directory into data once done)
-
-// sort the array
-allStems.sort(function (a,b) {
-    if (a.group > b.group) {
-        return 1;
-    }
-    else if (a.group < b.group) {
-      return -1;
-    }
-    else {
-      return 0;
+  
+  // filter out the blank groups
+  var filteredStems = allStems.filter(function(d) {
+    if (d.group != "") {
+      return d;
     }
   });
 
-currentGroup = allStems[0].group; // get first
-
-allStems.forEach(function(row){
-
-  if (row.group == currentGroup) {
-    // add stems to array
-    stemArray.push({"id": row.key, "stem": row.stem});
-  }
-  else {
-    if (currentGroup != "") {
-      stemMap.set(currentGroup, stemArray);
-    }
-    stemArray = []; // clear array
-    stemArray.push({"id": row.key, "stem": row.stem});
-    currentGroup = row.group; // next group
-  }
-});
-
-console.log("Done");
-return stemMap;
+  // sort the array
+  filteredStems.sort(function (a,b) {
+      if (a.group > b.group) {
+          return 1;
+      }
+      else if (a.group < b.group) {
+        return -1;
+      }
+      else {
+        return 0;
+      }
+    });
 
 
- 
+  currentGroup = filteredStems[0].group; // get first
+
+  filteredStems.forEach(function(row){
+      // go thru allStems array until group changes
+      if (row.group == currentGroup) {
+        // add stems to array
+        stemArray.push({"id": row.key, "stem": row.stem});
+      }
+      else {
+        // it changed -- save array to map for this group
+        stemMap.set(currentGroup, stemArray);
+        stemArray = []; // clear array
+        stemArray.push({"id": row.key, "stem": row.stem}); // first of new group
+        currentGroup = row.group; // next group
+      }
+  });
+
+  // finish last one
+  stemMap.set(currentGroup, stemArray);
+
+  console.log("Done");
+  return stemMap;
+
 }
 
 
@@ -112,31 +106,6 @@ return stemMap;
       saveAs(blob, filename);
      
   }
-
-
-
-
-    var saveArrayToFile = function(arrayOfLines, fileName) {
-     /* adds linebreaks at the end*/
-     var blob, blobText;
-     blobText = arrayOfLines.map(function(d) {
-       if (d.endsWith("\n")) {
-         return d;
-       } else {
-         return d + "\n";
-       }
-     });
-     blob = new Blob(blobText, {
-       type: "text/plain;charset=utf-8"
-     });
-     return saveAs(blob, fileName);
-   };
-
-   String.prototype.endsWith = function(suffix) {
-     return this.indexOf(suffix, this.length - suffix.length) !== -1;
-   };
-
-
 
 
 </script>
