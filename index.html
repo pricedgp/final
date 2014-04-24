@@ -45,25 +45,25 @@
 							<td id="lyricDetails" rowspan="7"></td>
 						</tr>
 						<tr>
-							<td id="pos">Positivity</td>
+							<td id="pos" class="clickable">Positivity</td>
 						</tr>
 						<tr>
-							<td id="neg">Negativity</td>
+							<td id="neg" class="clickable">Negativity</td>
 						</tr>
 						<tr>
-							<td id="vio">Violence</td>
+							<td id="vio" class="clickable">Violence</td>
 						</tr>
 						<tr>
-							<td id="color">Colors</td>
+							<td id="color" class="clickable">Colors</td>
 						</tr>
 						<tr>
-							<td id="bod">Body</td>
+							<td id="bod" class="clickable">Body</td>
 						</tr>
 						<tr>
-							<td id="reli">Religion</td>
+							<td id="reli" class="clickable">Religion</td>
 						</tr>
 						<tr>
-							<td id="rela">Relations</td>
+							<td id="rela" class="clickable">Relations</td>
 						</tr>
 					</tbody>
 				</table>
@@ -76,15 +76,13 @@
 							<th><h5>#</h5></th>
 							<th><h5>Title</h5></th>
 							<th><h5>Artist</h5></th>
-							<th id="MusicPropType"><h5>Property</th>
+							<th id="MusicPropType" class="clickable"><h5>Property</h5></th>
 						</tr>
 					</thead>
 					<tbody>
 					</tbody>
 				</table>
-			</div><br />
-
-			<div id="graph"></div>
+			</div>
 
 			<div id="story">
 				<table id="storyTable">
@@ -94,6 +92,21 @@
 					<tbody>
 					</tbody>
 				</table>
+			</div>
+
+			<div id="graphContainer">
+				<div id="legend">
+					<table>
+						<thead>
+							<tr><th colspan="2">Legend</th></tr>
+						</thead>
+						<tbody>
+							<tr><td><div class="unemployDiv"></div></td><td>Unemployment Rate</td></tr>
+							<tr><td><div class="spDiv"></div></td><td>S&amp;P Rate Change</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div id="graph"></div>
 			</div>
 		</div>
 
