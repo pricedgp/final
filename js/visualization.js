@@ -263,6 +263,16 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
           populateMusicDetailsTable(currentSelection);
         });
 
+        $("#helpMask").click(function() {
+          $("#helpMask").hide();
+          $("#helpInstructions").hide();
+        });
+
+        $("#helpBtn").click(function() {
+          $("#helpMask").show();
+          $("#helpInstructions").show();
+        });
+
         brushed();
       });
     });

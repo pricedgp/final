@@ -124,3 +124,83 @@ td
 {
 	fill: #ccc;
 }
+#helpBtn
+{
+	margin: 20px 20px;
+}
+#helpMask
+{
+	cursor: pointer;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 1001;
+	background-color: black;
+	opacity: 0.4;
+}
+#helpInstructions
+{
+	z-index: 1002;
+	position: fixed;
+}
+.instructionSpan
+{
+	z-index: 1002;
+	position:fixed;
+	background-color: #ccccff;
+	padding: 5px;
+	border-radius: 5px;
+}
+#musicQualHelp span
+{
+	top: 20px;
+}
+#musicQualHelp img
+{
+	position: fixed;
+	transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+	top: 75px;
+}
+#tableSortHelp span
+{
+	top: 110px;
+	left: 400px;
+}
+#tableSortHelp img
+{
+	position: fixed;
+	-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-webkit-transform: rotate(270deg);
+	top: 50px;
+	left: 525px;
+}
+#lyricHelp span
+{
+	top: 190px;
+	left: 640px;
+}
+#lyricHelp img
+{
+	position: relative;
+	-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-webkit-transform: rotate(270deg);
+	top: 130px;
+	left: 650px;
+}
+#graphHelp span
+{
+	top: 580px;
+	left: 270px;
+}
+#graphHelp img
+{
+	position: fixed;
+	top: 575px;
+	left: 505px;
+}

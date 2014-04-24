@@ -5,6 +5,7 @@
 		<title>Music Attributes</title>
 
 		<link rel="Stylesheet" href="./css/style.css" type="text/css">
+		<script src="./libs/jquery-1.10.1.js"></script>
     	<script src="./libs/d3.v3.min.js"></script>
 	</head>
 	<body>
@@ -24,6 +25,21 @@
 							<td id="energyAve"></td>
 							<td id="moodAve"></td>
 						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="musicDetails">
+				<table id="musicDetailsTable">
+					<thead>
+						<tr>
+							<th><h5>#</h5></th>
+							<th><h5>Title</h5></th>
+							<th><h5>Artist</h5></th>
+							<th id="MusicPropType" class="clickable"><h5>Property</h5></th>
+						</tr>
+					</thead>
+					<tbody>
 					</tbody>
 				</table>
 			</div>
@@ -69,25 +85,10 @@
 				</table>
 			</div>
 
-			<div id="musicDetails">
-				<table id="musicDetailsTable">
-					<thead>
-						<tr>
-							<th><h5>#</h5></th>
-							<th><h5>Title</h5></th>
-							<th><h5>Artist</h5></th>
-							<th id="MusicPropType" class="clickable"><h5>Property</h5></th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-
 			<div id="story">
 				<table id="storyTable">
 					<thead>
-						<tr><th colspan="2"><h5>Important Events</h5></th></tr>
+						<tr><th colspan="2"><h5>Significant Events</h5></th></tr>
 					</thead>
 					<tbody>
 					</tbody>
@@ -105,8 +106,34 @@
 							<tr><td><div class="spDiv"></div></td><td>S&amp;P Rate Change</td></tr>
 						</tbody>
 					</table>
+					<form>
+						<input type="submit" value="HELP" id="helpBtn" />
+					</form>
 				</div>
 				<div id="graph"></div>
+			</div>
+		</div>
+
+		<div id="helpMask"></div>
+		<div id="helpInstructions">
+			<div id="musicQualHelp">
+				<span class="instructionSpan">Click to see top songs in each category</span>
+				<img src="./images/arrow.png">
+			</div>
+
+			<div id="tableSortHelp">
+				<span class="instructionSpan">Click to view the bottom songs</span>
+				<img src="./images/arrow.png">
+			</div>
+
+			<div id="lyricHelp">
+				<span class="instructionSpan">Click to see top word stem details</span>
+				<img src="./images/arrow.png">
+			</div>
+
+			<div id="graphHelp">
+				<span class="instructionSpan">Click and drag to change date range</span>
+				<img src="./images/arrow.png">
 			</div>
 		</div>
 
