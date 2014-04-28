@@ -1,16 +1,18 @@
 var econData, qualityData, econStoriesData, wordData = {}, 
     currentSelection = "danceability",
     sortOrder = 'desc',
-    lyricDetailsSelection = "pos";
+    lyricDetailsSelection = "pos",
+    maxStoriesCount = 15,
+    maxLyricDetails = 15;
 
 var margin = {top: 10, right: 15, bottom: 100, left: 40},
-    margin2 = {top: 430, right: 10, bottom: 20, left: 40},
-    width = 895 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom,
-    height2 = 500 - margin2.top - margin2.bottom,
+    margin2 = {top: 195, right: 10, bottom: 20, left: 40},
+    width = 725 - margin.left - margin.right,
+    height = 275 - margin.top - margin.bottom,
+    height2 = 275 - margin2.top - margin2.bottom,
     musicQualHeight = 300,
     musicQualWidth = 70,
-    musicQualRectWidth = 30,
+    musicQualRectWidth = 50,
     defaultTextSize = 8,
     posSize = defaultTextSize,
     negSize = defaultTextSize,
@@ -30,9 +32,11 @@ var x = d3.time.scale().range([0, width-margin.right]),
     y = d3.scale.linear().range([height, 0]),
     y2 = d3.scale.linear().range([height2, 0]),
     y3 = d3.scale.linear().range([height, 0]),
+    y4 = d3.scale.linear().range([height2, 0]),
     qualScale = d3.scale.linear().range([500,0]).domain([0,1]),
     qualScale2 = d3.scale.linear().range([0,70]).domain([0,1]),
-    lyricScale = d3.scale.linear().range([8,24]); // pt scale
+    //stemCountScale = d3.scale.linear().range([0,70]),
+    lyricScale = d3.scale.linear().range([7,22]); // pt scale
 
 // set up axis scales
 var xAxis = d3.svg.axis().scale(x).orient("bottom"),
@@ -56,14 +60,20 @@ var spLine = d3.svg.area()
     .y0(height)
     .y1(function(d) { return y3(d.sp500_pc1); });
 
-var overview = d3.svg.area()
+var unemployOverview = d3.svg.area()
     .interpolate("monotone")
     .x(function(d) { return x2(d.obs_date); })
     .y0(height2)
     .y1(function(d) { return y2(d.unemployment); });
 
+var spOverview = d3.svg.area()
+    .interpolate("monotone")
+    .x(function(d) { return x2(d.obs_date); })
+    .y0(height2)
+    .y1(function(d) { return  y4(d.sp500_pc1); });
+
 var svgGraph = d3.select("#graph").append("svg")
-    .attr("width", width + margin.left + margin.right)
+    .attr("width", width + margin.left + margin.right + 13)
     .attr("height", height + margin.top + margin.bottom);
 
 svgGraph.append("defs").append("clipPath")
@@ -131,7 +141,9 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
   y3.domain([d3.min(data.map(function(d) { return d.sp500_pc1; })), d3.max(data.map(function(d) { return d.sp500_pc1; }))]);
   x2.domain(x.domain());
   y2.domain(y.domain());
+  y4.domain(y3.domain());
 
+  // fill in details graph
   focus.append("path")
       .datum(data)
       .attr("class", "line")
@@ -151,15 +163,22 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
       .attr("class", "y axis")
       .call(yAxis);
 
+
   focus.append("g")
       .attr("class", "y axis")
       .attr("transform","translate(" + (width-margin.right) + ",0)")
       .call(yAxis2);
 
+  // fill in overview graph
   context.append("path")
       .datum(data)
-      .attr("class", "area")
-      .attr("d", overview);
+      .attr("class", "line")
+      .attr("d", unemployOverview);
+
+  context.append("path")
+      .datum(data)
+      .attr("class", "spLine")
+      .attr("d", spOverview);
 
   context.append("g")
       .attr("class", "x axis")
@@ -192,30 +211,53 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
 
         var danceRect = danceAveGraph.append("rect")
           .attr("height", danceHeight)
-          .attr("y", function() { return musicQualHeight - danceHeight; })
+          .attr("y", function() { return musicQualHeight - danceHeight + 7; })
           .attr("width", musicQualRectWidth)
           .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-          .attr("class","musicQualDance");
+          .attr("class","musicQualDance clickable");
 
         var energyRect = energyAveGraph.append("rect")
           .attr("height", energyHeight)
           .attr("y", function() { return musicQualHeight - energyHeight; })
           .attr("width", musicQualRectWidth)
           .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-          .attr("class","musicQualEnergy");
+          .attr("class","musicQualEnergy clickable inactive");
 
         var moodRect = moodAveGraph.append("rect")
           .attr("height", moodHeight)
           .attr("y", function() { return musicQualHeight - moodHeight; })
           .attr("width", musicQualRectWidth)
           .attr("x", (musicQualWidth - musicQualRectWidth)/2)
-          .attr("class","musicQualMood");
+          .attr("class","musicQualMood clickable inactive");
 
-        danceRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("danceability"); });
-        energyRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("energy"); });
-        moodRect.on("click", function() { sortOrder = 'desc'; populateMusicDetailsTable("mood"); });
+        danceRect.on("click", function() 
+        {
+          danceRect.classed("inactive",false);
+          energyRect.classed("inactive",true);
+          moodRect.classed("inactive",true);
+          sortOrder = 'desc';
+          populateMusicDetailsTable("danceability"); 
+        });
+        energyRect.on("click", function() 
+        {
+          danceRect.classed("inactive",true);
+          energyRect.classed("inactive",false);
+          moodRect.classed("inactive",true);
+          sortOrder = 'desc';
+          populateMusicDetailsTable("energy");
+        });
+
+        moodRect.on("click", function() 
+        {
+          danceRect.classed("inactive",true);
+          energyRect.classed("inactive",true);
+          moodRect.classed("inactive",false);
+          sortOrder = 'desc';
+          populateMusicDetailsTable("mood");
+        });
 
         d3.select("#MusicPropType h5").on("click", function() {
+
           if (sortOrder == 'desc')
             sortOrder = 'asc';
           else
@@ -224,8 +266,17 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
           populateMusicDetailsTable(currentSelection);
         });
 
-        populateMusicDetailsTable("danceability");
-        populateStoriesTable();
+        $("#helpMask").click(function() {
+          $("#helpMask").hide();
+          $("#helpInstructions").hide();
+        });
+
+        $("#helpBtn").click(function() {
+          $("#helpMask").show();
+          $("#helpInstructions").show();
+        });
+
+        brushed();
       });
     });
   });
@@ -343,11 +394,56 @@ function populateMusicDetailsTable(valueProperty)
   }
 
   if (valueProperty == "danceability")
-    d3.select("#MusicPropType h5").html("Danceability");
+    d3.select("#MusicPropType h5").html('<img alt="sort descending" src="./images/sort_' + sortOrder + '.png">Danceability');
   else if (valueProperty == "energy")
-    d3.select("#MusicPropType h5").html("Energy");
+    d3.select("#MusicPropType h5").html('<img alt="sort descending" src="./images/sort_' + sortOrder + '.png">Energy');
   else if (valueProperty == "mood")
-    d3.select("#MusicPropType h5").html("Mood");
+    d3.select("#MusicPropType h5").html('<img alt="sort descending" src="./images/sort_' + sortOrder + '.png">Mood');
+
+  d3.select("#musicDetailsTable tbody").html(tableHTML);
+}
+
+
+function populateMusicDetailsTableWithWord(word)
+{
+  var unsortedTracks = [];
+  var tracks = [];
+
+  // get the track IDs in the current range
+  var trackSet = getTrackSet(qualityData, "date");
+  // get the tracks in the range that contain this word
+  trackStems = getTracksWithWord(trackSet, word);
+
+  // get the track data from qualityData
+  qualityData.forEach(function(track){
+    trackStems.forEach(function(trackStem) {
+      var t = trackStem.track_id;
+      if (track.track_id == t) {
+      // create new obj
+      var obj = {"artist": track.artist, "track": track.track, 
+        "track_id": track.track_id, "stem": trackStem.stem, "count": trackStem.cnt, "date": track.date};
+        unsortedTracks.push(obj);
+      }
+    });
+  });
+  tracks = sortByProperty(unsortedTracks, "count");
+
+  currentSelection = word;
+
+  
+  var tableHTML = "";
+
+  for (var i = 0; i < tracks.length; i++)
+  {
+    tableHTML += "<tr>" + 
+                    "<td>" + (i+1) + "</td>" + 
+                    "<td>" + tracks[i].track + "</td>" + 
+                    "<td>" + tracks[i].artist + "</td>" + 
+                    "<td>" + tracks[i].count + "</td></tr>" 
+
+  }
+
+  d3.select("#MusicPropType h5").html('<img alt="sort descending" src="./images/sort_' + sortOrder + '.png">' + word);
 
   d3.select("#musicDetailsTable tbody").html(tableHTML);
 }
@@ -356,6 +452,7 @@ function populateStoriesTable()
 {
   var minDate = brush.extent()[0];
   var maxDate = brush.extent()[1];
+  var storiesCount = 0;
 
   var storiesHTML = "";
 
@@ -363,9 +460,13 @@ function populateStoriesTable()
   {
     var d = econStoriesData[i];
 
-    if ((d.year >= minDate.getFullYear() && d.year <= maxDate.getFullYear()) || minDate == maxDate)
+    if ((d.year >= minDate.getFullYear() && d.year <= maxDate.getFullYear()) || minDate.getTime() === maxDate.getTime())
     {
       storiesHTML += "<tr><td>" + d.year + "</td><td>" + d.story + "</td>";
+      storiesCount++;
+
+      if (storiesCount == maxStoriesCount)
+        break;
     }
   }
 
@@ -485,18 +586,77 @@ function populateLyricsDetail(tracks, group)
   }); // end tracks
 
   formatLyricsDetail(stemData);
+}
+
+function formatLyricsDetail(stemMap) {
+  var lyricDetailsCount = 0;
+
+  var tempSortList = [];
+  var sortList = [];
+  for (var stem in stemMap)
+    tempSortList.push([stem, stemMap[stem]]);
+
+  tempSortList.sort(function(a, b) {return b[1] - a[1]});
+
+  sortList = tempSortList.slice(0, maxLyricDetails);
+
+
+  var lyricsHTML = "";
+  
+  for (var i = 0; i < sortList.length; i++)
+  {
+    var d = sortList[i];
+
+    // hack
+    var stem = d[0].substr(1, d[0].length);
+
+    lyricsHTML += "<tr><td class='clickable' onclick=\"populateMusicDetailsTableWithWord('" + stem + "')\"><ul><li>" + stem + " (" + d[1] + ")</li></ul></td></tr>";
+    lyricDetailsCount++;
+
+    if (lyricDetailsCount == maxLyricDetails)
+      break;
   }
 
+  d3.select("#stemDetails").html(lyricsHTML);
+
+}
+
 // ===========================================================
-function formatLyricsDetail(stemMap) {
-  var lyricsHTML = "<ul>";
+function getTracksWithWord(tracks, stem) {
 
-  stemMap.forEach(function(stem, cnt) {
-    lyricsHTML += "<li>" + stem + " (" + cnt + ")</li>";
-  });
+  var cnt = 0;
+  var hasStem;
+  var tracksWithWord = [];
 
-  lyricsHTML += "</ul>"
-  d3.select("#lyricDetails").html(lyricsHTML);
+ // retrieve the track from wordData if it's there
+  tracks.forEach(function(track){
+    hasStem = false;
+    if (wordData.has(track)) {
+      var vals = wordData.get(track);
+        // for each group
+      vals.forEach(function(v) { 
+          // get stems
+          var stems = v[0].stems;
+          // go thru stems array 
+          // each stemObj has stem, cnt
+          stems.forEach(function(stemObj){
+            if (stemObj.stem == stem) {
+              // update its count -- there will be only 0-1 match
+              cnt = stemObj.cnt;
+              hasStem = true;
+            }
+          }); // end stems
+      if (hasStem) {
+        tracksWithWord.push({"track_id": track, "stem": stem, "cnt": cnt});
+        hasStem = false;
+      }
+        
+      }); // end vals
+
+    }
+  }); // end tracks
+
+  return tracksWithWord; 
 }
 
 

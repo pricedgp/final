@@ -1,15 +1,88 @@
+body
+{
+	width: 1260px;
+}
 h5
 {
+	font-family: Verdana, sans-serif;
+	font-size: 12px;
 	margin-top: 2px;
 	margin-bottom: 2px;
+	font-weight: bold;
 }
 div
 {
 	float: left;
+	margin-right: 40px;
 }
+#musicQualities
+{
+	width: 350px;
+	height: 341px;
+	background-color: #E7F0FC;
+}
+#musicQualities td
+{
+	border-spacing: 0;
+	padding-left: 25px;
+}
+#lyricQualities
+{
+	width: 350px;
+	height: 341px;
+	background-color: #E7F0FC;
+}
+#lyricQualities td
+{
+	padding-left: 10px;
+}
+#musicDetails
+{
+	width: 350px;
+	height: 341px;
+	background-color: #E7F0FC;
+}
+#musicDetails td
+{
+	padding-left: 10px;
+}
+
+#story
+{
+	width: 350px;
+	float: right;
+	background-color: #E7F0FC;
+	padding-left: 10px;
+}
+#graphContainer
+{
+	margin-top: 25px;
+	clear: left;
+}
+#graph
+{
+	background-color: #E7F0FC;
+
+	
+}
+#title
+{
+	margin-top: 25px;
+	margin-bottom: 30px;
+	font-size: 28px;
+	text-align: left;
+	font-family: Arial, sans-serif;
+
+}
+#help
+{
+	text-align: right;
+}
+
 svg
 {
 	font: 10px sans-serif;
+	
 }
 .area
 {
@@ -17,22 +90,33 @@ svg
 	stroke-width: 1px;
 	clip-path: url(#clip);
 }
-
 .lit
 {
-	color: orange;
+	color: #C61FCF;
 }
 .line, .spLine
 {
 	fill: none;
-	stroke: steelblue;
+	stroke: #78DCDB;
 	stroke-width: 2;
 	shape-rendering: crispEdges;
 	clip-path: url(#clip);
 }
 .spLine
 {
-	stroke: red;
+	stroke: #796CD4;
+}
+.unemployDiv
+{
+	width: 10px;
+	height: 10px;
+	background-color: #ffcccc;
+}
+.spDiv
+{
+	width: 10px;
+	height: 10px;
+	background-color: #ccccff;
 }
 .axis path, .axis line
 {
@@ -43,8 +127,12 @@ svg
 .brush .extent
 {
 	stroke: #fff;
-	fill-opacity: .125;
+	fill-opacity: .25;
 	shape-rendering: crispEdges;
+}
+.clickable
+{
+	cursor: pointer;
 }
 .musicQualDance
 {
@@ -56,15 +144,132 @@ svg
 }
 .musicQualMood
 {
-	fill: #763026;
+	fill: #796CD4;
 }
 th
 {
-	background-color: #E9EDF8;
+	background-color: none;
 }
 table,th,td
 {
 	border: none;
 	border-collapse: collapse;
-	font: sans-serif;
+	font-family: verdana, sans-serif;
+	font-size: 11px;
+	font-weight: bolder;
+	vertical-align: top;
+
+}
+table.fixed 
+{ 
+	table-layout:fixed; 
+}
+table.fixed td 
+{ 
+	overflow: hidden; 
+}
+td
+{
+	padding-right: 10px;
+}
+.inactive
+{
+	fill: #ccc;
+}
+#helpBtn
+{
+	margin: 20px 20px;
+}
+#helpMask
+{
+	cursor: pointer;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 1001;
+	background-color: black;
+	opacity: 0.4;
+}
+#helpInstructions
+{
+	z-index: 1002;
+	position: fixed;
+}
+.instructionSpan
+{
+	z-index: 1002;
+	position:fixed;
+	background-color: #ccccff;
+	padding: 5px;
+	border-radius: 5px;
+}
+#musicQualHelp span
+{
+	top: 20px;
+}
+#musicQualHelp img
+{
+	position: fixed;
+	transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+	top: 75px;
+}
+#tableSortHelp span
+{
+	top: 110px;
+	left: 400px;
+}
+#tableSortHelp img
+{
+	position: fixed;
+	-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-webkit-transform: rotate(270deg);
+	top: 50px;
+	left: 525px;
+}
+#lyricHelp span
+{
+	top: 190px;
+	left: 640px;
+}
+#lyricHelp img
+{
+	position: relative;
+	-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-webkit-transform: rotate(270deg);
+	top: 130px;
+	left: 650px;
+}
+#graphHelp span
+{
+	top: 580px;
+	left: 270px;
+}
+#graphHelp img
+{
+	position: fixed;
+	top: 575px;
+	left: 505px;
+}
+
+ul {
+    list-style: none;
+    padding:0;
+    margin:0;
+}
+
+li { 
+    padding-left: 1em; 
+    text-indent: -.7em;
+}
+
+li:before {
+    content: "•";
+    padding-right: 7px;
+    color: #C61FCF; 
 }
