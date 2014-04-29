@@ -1,8 +1,10 @@
 var econData, qualityData, econStoriesData, wordData = {}, 
+    danceRect, energyRect, moodRect, currentWord, 
+    currentDetailType = "QualitySort", 
     currentSelection = "danceability",
     sortOrder = 'desc',
     lyricDetailsSelection = "pos",
-    maxStoriesCount = 15,
+    maxStoriesCount = 6,
     maxLyricDetails = 15;
 
 var margin = {top: 10, right: 15, bottom: 100, left: 40},
@@ -209,21 +211,21 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
         var energyHeight = qualScale(d3.mean(data2.map(function(d) { return d.energy; })));
         var moodHeight = qualScale(d3.mean(data2.map(function(d) { return d.mood; })));
 
-        var danceRect = danceAveGraph.append("rect")
+        danceRect = danceAveGraph.append("rect")
           .attr("height", danceHeight)
           .attr("y", function() { return musicQualHeight - danceHeight + 7; })
           .attr("width", musicQualRectWidth)
           .attr("x", (musicQualWidth - musicQualRectWidth)/2)
           .attr("class","musicQualDance clickable");
 
-        var energyRect = energyAveGraph.append("rect")
+        energyRect = energyAveGraph.append("rect")
           .attr("height", energyHeight)
           .attr("y", function() { return musicQualHeight - energyHeight; })
           .attr("width", musicQualRectWidth)
           .attr("x", (musicQualWidth - musicQualRectWidth)/2)
           .attr("class","musicQualEnergy clickable inactive");
 
-        var moodRect = moodAveGraph.append("rect")
+        moodRect = moodAveGraph.append("rect")
           .attr("height", moodHeight)
           .attr("y", function() { return musicQualHeight - moodHeight; })
           .attr("width", musicQualRectWidth)
@@ -235,14 +237,17 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
           danceRect.classed("inactive",false);
           energyRect.classed("inactive",true);
           moodRect.classed("inactive",true);
+          d3.selectAll("#stemDetails td").classed("lit",false);
           sortOrder = 'desc';
           populateMusicDetailsTable("danceability"); 
         });
+
         energyRect.on("click", function() 
         {
           danceRect.classed("inactive",true);
           energyRect.classed("inactive",false);
           moodRect.classed("inactive",true);
+          d3.selectAll("#stemDetails td").classed("lit",false);
           sortOrder = 'desc';
           populateMusicDetailsTable("energy");
         });
@@ -252,6 +257,7 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
           danceRect.classed("inactive",true);
           energyRect.classed("inactive",true);
           moodRect.classed("inactive",false);
+          d3.selectAll("#stemDetails td").classed("lit",false);
           sortOrder = 'desc';
           populateMusicDetailsTable("mood");
         });
@@ -263,7 +269,11 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
           else
             sortOrder = 'desc';
 
-          populateMusicDetailsTable(currentSelection);
+          if (currentDetailType == "WordSort")
+            populateMusicDetailsTableWithWord(currentWord);
+          else
+            populateMusicDetailsTable(currentSelection);
+
         });
 
         $("#helpMask").click(function() {
@@ -272,6 +282,7 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
         });
 
         $("#helpBtn").click(function() {
+          window.scrollTo(0,0);
           $("#helpMask").show();
           $("#helpInstructions").show();
         });
@@ -319,6 +330,7 @@ function brushed() {
 
   posText.style("font-size", posSize + "pt")
     .on("click", function(){
+      d3.select(this).style("color","red");
       populateLyricsDetail(trackData, "pos");
   });
   negText.style("font-size", negSize + "pt")
@@ -370,6 +382,7 @@ function populateMusicDetailsTable(valueProperty)
 {
   var tracks = sortByProperty(qualityData, valueProperty);
   currentSelection = valueProperty;
+  currentDetailType = 'QualitySort';
 
   var tableHTML = "";
 
@@ -406,6 +419,12 @@ function populateMusicDetailsTable(valueProperty)
 
 function populateMusicDetailsTableWithWord(word)
 {
+  d3.selectAll("#stemDetails td").classed("lit",false);
+  d3.select("#" + word).classed("lit",true);
+
+  currentWord = word;
+  currentDetailType = 'WordSort';
+
   var unsortedTracks = [];
   var tracks = [];
 
@@ -413,6 +432,10 @@ function populateMusicDetailsTableWithWord(word)
   var trackSet = getTrackSet(qualityData, "date");
   // get the tracks in the range that contain this word
   trackStems = getTracksWithWord(trackSet, word);
+
+  danceRect.classed("inactive",true);
+  energyRect.classed("inactive",true);
+  moodRect.classed("inactive",true);
 
   // get the track data from qualityData
   qualityData.forEach(function(track){
@@ -610,7 +633,7 @@ function formatLyricsDetail(stemMap) {
     // hack
     var stem = d[0].substr(1, d[0].length);
 
-    lyricsHTML += "<tr><td class='clickable' onclick=\"populateMusicDetailsTableWithWord('" + stem + "')\"><ul><li>" + stem + " (" + d[1] + ")</li></ul></td></tr>";
+    lyricsHTML += "<tr><td class='clickable' id='" + stem + "' onclick=\"populateMusicDetailsTableWithWord('" + stem + "')\"><ul><li>" + stem + " (" + d[1] + ")</li></ul></td></tr>";
     lyricDetailsCount++;
 
     if (lyricDetailsCount == maxLyricDetails)

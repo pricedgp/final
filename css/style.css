@@ -18,7 +18,7 @@ div
 #musicQualities
 {
 	width: 350px;
-	height: 341px;
+	height: 365px;
 	background-color: #E7F0FC;
 }
 #musicQualities td
@@ -29,7 +29,7 @@ div
 #lyricQualities
 {
 	width: 350px;
-	height: 341px;
+	height: 365px;
 	background-color: #E7F0FC;
 }
 #lyricQualities td
@@ -39,7 +39,7 @@ div
 #musicDetails
 {
 	width: 350px;
-	height: 341px;
+	height: 365px;
 	background-color: #E7F0FC;
 }
 #musicDetails td
@@ -62,8 +62,6 @@ div
 #graph
 {
 	background-color: #E7F0FC;
-
-	
 }
 #title
 {
@@ -106,17 +104,31 @@ svg
 {
 	stroke: #796CD4;
 }
+#graphLegend
+{
+	position: fixed;
+	left: 60px;
+	top: 495px;
+	z-index: 1002;
+	background-color: #ccc;
+}
+#graphLegend td
+{
+	text-align: left;
+}
 .unemployDiv
 {
 	width: 10px;
 	height: 10px;
-	background-color: #ffcccc;
+	margin-right: 5px;
+	background-color: #78DCDB;
 }
 .spDiv
 {
 	width: 10px;
 	height: 10px;
-	background-color: #ccccff;
+	margin-right: 5px;
+	background-color: #796CD4;
 }
 .axis path, .axis line
 {
@@ -178,7 +190,7 @@ td
 }
 #helpBtn
 {
-	margin: 20px 20px;
+	margin: 3px 20px;
 }
 #helpMask
 {
@@ -207,7 +219,8 @@ td
 }
 #musicQualHelp span
 {
-	top: 20px;
+	top: 110px;
+	left: 20px;
 }
 #musicQualHelp img
 {
@@ -215,12 +228,13 @@ td
 	transform: rotate(90deg);
 	-ms-transform: rotate(90deg);
 	-webkit-transform: rotate(90deg);
-	top: 75px;
+	top: 165px;
+	left: 30px;
 }
 #tableSortHelp span
 {
-	top: 110px;
-	left: 400px;
+	top: 215px;
+	left: 960px;
 }
 #tableSortHelp img
 {
@@ -228,46 +242,67 @@ td
 	-transform: rotate(270deg);
 	-ms-transform: rotate(270deg);
 	-webkit-transform: rotate(270deg);
-	top: 50px;
-	left: 525px;
+	top: 155px;
+	left: 1056px;
 }
 #lyricHelp span
 {
-	top: 190px;
-	left: 640px;
+	top: 250px;
+	left: 410px;
 }
 #lyricHelp img
 {
-	position: relative;
+	position: fixed;
 	-transform: rotate(270deg);
 	-ms-transform: rotate(270deg);
 	-webkit-transform: rotate(270deg);
-	top: 130px;
-	left: 650px;
+	top: 190px;
+	left: 430px;
 }
 #graphHelp span
 {
-	top: 580px;
-	left: 270px;
+	top: 695px;
+	left: 70px;
 }
 #graphHelp img
 {
 	position: fixed;
-	top: 575px;
-	left: 505px;
+	top: 690px;
+	left: 305px;
 }
-
-ul {
+#lyricDetailHelp span
+{
+	position: fixed;
+	left: 450px;
+	top: 320px;
+}
+#lyricDetailHelp img
+{
+	position: fixed;
+	-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-webkit-transform: rotate(270deg);
+	left: 625px;
+	top: 260px;
+}
+#descriptionHelp
+{
+	position: fixed;
+	width: 315px;
+	left: 800px;
+	top: 300px;
+}
+ul
+{
     list-style: none;
     padding:0;
     margin:0;
 }
-
-li { 
+li
+{ 
     padding-left: 1em; 
     text-indent: -.7em;
 }
-
 li:before {
     content: "•";
     padding-right: 7px;
