@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
-<<<<<<< HEAD
+
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Popular Music and Economics</title>
+    <title>Economic Trends and Popular Music</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -14,243 +14,103 @@
     <![endif]-->
   </head>
   <body>
-    <div class="wrapper">
+  	    <div id='cssmenu'>
+      <ul>
+        <li class='active'>
+          <a href='index.html'>
+            <span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href='viz.html'>
+            <span>Visualization</span>
+          </a>
+        </li>
+        <li>
+          <a href='www.youtube.com' target='_blank'>
+            <span>Video</span>
+          </a>
+        </li>
+        <li class='last'>
+          <a href='#'>
+            <span>Process Book</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class='wrapper'>
       <header>
-        <h1>Popular Music and Economics</h1>
+        <h1>Popular Music and Economic Trends</h1>
         <p>Visualization of the Impact of Economics on Popular Music</p>
 
-        <p class="view"><a href="https://github.com/pricedgp/final">View the Project on GitHub <small>pricedgp/final</small></a></p>
+        <p>Glen Barger and David Price<br>CS-171 Data Visualization, 2014</p>
 
 
-        <ul>
-          <li><a href="https://github.com/pricedgp/final/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/pricedgp/final/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/pricedgp/final">View On <strong>GitHub</strong></a></li>
-        </ul>
       </header>
       <section>
         <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>About This Visualization</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>This visualization allows you to explore this question: <i>What impacts do economic trends have on the qualities of music that become popular?</i></p> 
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<p>For example, during a recession, does popular music become more, or less, energetic? Do song lyrics contain more, or fewer, references to things like money, paychecks, and work, or does the opposite occur – during recession, do people want to hear about distracting subjects that have nothing to do with the economy? What about words associated with religion, or colors, or the body – do those change in response to economic trends? Is there any correlation at all?</p>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h3>How to Use It</h3>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<ul>
+<li>Pick a time period from the economy graph at the bottom.</li>
+<li>Look at the important political and economic events that happened in that period. </li>
+<li>Move the slider and watch the musical qualities change over time.</li>
+<li>Watch the song list change as you select different musical qualities. The list shows the top 10 songs for the period, sorted by that musical quality.</li>
+<li>Toggle the sort on the song list. </li>
+<li>Watch the words representing lyric groupings change size as you select different time periods. The size indicates the relative number of words in that category per song for the period. </li>
+<li>Click a lyric category to see the word stems (individual words) and their counts for that period.</li>
+<li>Click an individual word stem to see the songs that have that word stem. </li>
+</ul>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<h3>Data</h3>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>We show US economic indicators together with the music that made the charts during the period 1958-2012, visualizing musical qualities and lyrics</p>
+<h4>Economic Trends</h4>
+<p>Data source: Federal Reserve Bank of St. Louis (<a href="http://research.stlouisfed.org/fred2">http://research.stlouisfed.org/fred2</a>), 1958-2012.</p>
+<p>
+<ul>
+<li>Civilian Unemployment Rate, Percent, Monthly, Seasonally Adjusted </li>
+<li>S&amp;P 500 Stock Price Index, Percent Change from Year Ago, Monthly, Not Seasonally Adjusted </li></ul></p>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<h4>Music Chart Data</h4>
+<p>The Whitburn Project is maintained by a group of music enthusiasts whose goal is to document chart data on popular music starting in the 1890s. The data details all music that reached the top 100 (not only restricted to Billboard). </p>
+<p>More information: <a href="http://waxy.org/2008/05/the_whitburn_project">http://waxy.org/2008/05/the_whitburn_project</a></p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<h4>Music Qualities</h4>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<p>We began our data gathering with the “Million Song Database,” a dataset curated by The Echo Nest, a company born out of the MIT Media Lab in a project to catalog musical attributes. Echo Nest is now used to help drive recommendation engines behind popular online music applications like Rdio and Spotify, the latter of which recently announced the acquisition of The Echo Nest. Echo Nest provides a very robust API for developers to call and retrieve their catalogued attributes.</p>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Data source: <a href="http://developer.echonest.com/acoustic-attributes.html">http://developer.echonest.com/acoustic-attributes.html</a></p>
+
+<p>More information: <a href="http://echonest.com">http://echonest.com</a></p>
+
+<h4>Lyrics</h4>
+<p>For the lyrics data, we began with a dataset that was created by a collaboration between Echo Nest and MusicXMatch. The dataset doesn’t contain full lyrics, due to the numerous copyright issues involved. Instead, it offers word counts (using word stemming) for each song in a “word bag” form. In all, there are some 237K songs for which there are word bags in this dataset. </p>
+
+<p>Data source: <a href="http://labrosa.ee.columbia.edu/millionsong/musixmatch">http://labrosa.ee.columbia.edu/millionsong/musixmatch</a></p>
+
+<h3>Libraries/Citations</h3>
+<p>
+  <ul>
+    <li>jquery-1.10.1.js</li>
+    <li>d3.v3.min.js</li>
+    <li>Menus built with CSS Menu Maker (<a href="http://cssmenumaker.com/builder/1827398">http://cssmenumaker.com/builder/1827398</a>)</li>
+
+
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/pricedgp">pricedgp</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
-    </div>
+</div>
     <script src="javascripts/scale.fix.js"></script>
     
   </body>
-=======
-	<head>
-		<meta charset="UTF-8">
-		<title>Popular Music and Economic Trends</title>
 
-		<link rel="Stylesheet" href="./css/style.css" type="text/css">
-		<script src="./libs/jquery-1.10.1.js"></script>
-    	<script src="./libs/d3.v3.min.js"></script>
-	</head>
-	<body>
-		<div id="title">
-			<table class="tg">
-  <tr>
-    <th id="title">Popular Music and Economic Trends</th>
-    <th id="help">					<form>
-						<input type="submit" value="Help" id="helpBtn" />
-					</form>
-</th>
-  </tr>
-</table>
-
-		</div>
-		<div id="viz">
-			<div id="musicQualities">
-				<table>
-					<thead>
-						<tr><th colspan="3"><h5>MUSICAL QUALITIES</h5></th></tr>
-						<tr>
-							<th><h5>Danceability</h5></th>
-							<th><h5>Energy</h5></th>
-							<th><h5>Mood</h5></th>
-					</thead>
-					<tbody>
-						<tr>
-							<td id="danceAve"></td>
-							<td id="energyAve"></td>
-							<td id="moodAve"></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div id="lyricQualities">
-				<table width>
-					<thead>
-						<tr>
-							<th colspan="2"><h5>LYRICS</h5></th></tr>
-						<tr>
-						<tr>
-							<th colspan="2"><h5>&nbsp;</h5></th></tr>
-						<tr>
-					</thead>
-
-					<tr>
-						<td>
-							<table>
-
-								<tbody id="lyricQualities">
-									<tr>
-										<td id="pos" class="clickable">Positivity</td>
-									</tr>
-									<tr>
-										<td id="neg" class="clickable">Negativity</td>
-									</tr>
-									<tr>
-										<td id="money" class="clickable">Money</td>
-									</tr>
-									<tr>
-										<td id="rela" class="clickable">Relationships</td>
-									</tr>
-									<tr>
-										<td id="reli" class="clickable">Religion</td>
-									</tr>
-									<tr>
-										<td id="vio" class="clickable">Violence</td>
-									</tr>
-									<tr>
-										<td id="color" class="clickable">Colors</td>
-									</tr>
-									<tr>
-										<td id="bod" class="clickable">Body</td>
-									</tr>
-								</tbody>
-							</table>
-					<td>
-						<table>
-							<tbody id="stemDetails">
-							</tbody>
-						</table>
-					</td>
-					</td>
-
-				</tr>
-
-
-			</table>
-			</div>
-
-			<div id="musicDetails">
-				<table id="musicDetailsTable" >
-					<thead>
-						<tr>
-							<th colspan="4"><h5>SONG DETAILS</h5></th>
-						</tr>
-						<tr>
-							<th><h5></h5></th>
-							<th><h5></h5></th>
-							<th><h5></h5></th>
-							<th id="MusicPropType" class="clickable"><h5>Property</h5></th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-
-			<div id="graphContainer">
-				<div id="graph"></div>
-				<div id="story">
-				<table id="storyTable">
-					<thead>
-						<tr><th colspan="2"><h5>Significant Events</h5></th></tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-
-			</div>
-		</div>
-
-		<div id="helpMask"></div>
-		<div id="helpInstructions">
-			<div id="musicQualHelp">
-				<span class="instructionSpan">Click to see top songs in each category</span>
-				<img src="./images/arrow.png">
-			</div>
-
-			<div id="tableSortHelp">
-				<span class="instructionSpan">Click to change the sort</span>
-				<img src="./images/arrow.png">
-			</div>
-
-			<div id="lyricHelp">
-				<span class="instructionSpan">Click to see top word stem details</span>
-				<img src="./images/arrow.png">
-			</div>
-
-			<div id="lyricDetailHelp">
-				<span class="instructionSpan">Click to see top songs with these word stems</span>
-				<img src="./images/arrow.png">
-			</div>
-
-			<div id="graphHelp">
-				<span class="instructionSpan">Click and drag to change date range</span>
-				<img src="./images/arrow.png">
-			</div>
-
-			<div id="graphLegend">
-				<table>
-					<tbody>
-						<tr>
-							<td><div class="unemployDiv"></div></td>
-							<td>Unemployment Rate</td>
-						</tr>
-						<tr>
-							<td><div class="spDiv"></div></td>
-							<td>S&P 500 Rate Change</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<div class = "instructionSpan" id="descriptionHelp">
-				<h5>Project Details</h5>
-				<p>
-					test stuff
-				</p>
-			</div>
-		</div>
-
-	</body>
-
-	<script src="./js/visualization.js"></script>
->>>>>>> origin/master
 </html>
