@@ -18,7 +18,7 @@ div
 #musicQualities
 {
 	width: 350px;
-	height: 365px;
+	height: 380px;
 	background-color: #E7F0FC;
 }
 #musicQualities td
@@ -29,7 +29,7 @@ div
 #lyricQualities
 {
 	width: 350px;
-	height: 365px;
+	height: 380px;
 	background-color: #E7F0FC;
 }
 #lyricQualities td
@@ -39,7 +39,7 @@ div
 #musicDetails
 {
 	width: 350px;
-	height: 365px;
+	height: 380px;
 	background-color: #E7F0FC;
 }
 #musicDetails td
@@ -49,7 +49,7 @@ div
 
 #story
 {
-	width: 350px;
+	width: 340px;
 	float: right;
 	background-color: #E7F0FC;
 	padding-left: 10px;
@@ -91,6 +91,7 @@ svg
 .lit
 {
 	color: #C61FCF;
+	fill: #C61FCF;
 }
 .line, .spLine
 {
@@ -307,4 +308,8 @@ li:before {
     content: "•";
     padding-right: 7px;
     color: #C61FCF; 
+}
+.hide
+{
+	display: none;
 }
