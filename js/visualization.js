@@ -1,4 +1,10 @@
-var econData, qualityData, econStoriesData, wordData = {}, 
+/**
+  Javascript for CSCI E-171 Final Project
+  Authors: Glen Barger and David Price
+
+  focus+context graph initial code from: http://bl.ocks.org/mbostock/1667367
+*/
+var econData, qualityData, econStoriesData, wordData = {}, maxValue, 
     danceRect, energyRect, moodRect, currentWord, 
     currentDetailType = "QualitySort", 
     currentSelection = "danceability",
@@ -12,7 +18,7 @@ var margin = {top: 10, right: 15, bottom: 100, left: 40},
     width = 725 - margin.left - margin.right,
     height = 275 - margin.top - margin.bottom,
     height2 = 275 - margin2.top - margin2.bottom,
-    musicQualHeight = 300,
+    musicQualHeight = 338,
     musicQualWidth = 70,
     musicQualRectWidth = 50,
     defaultTextSize = 8,
@@ -35,9 +41,9 @@ var x = d3.time.scale().range([0, width-margin.right]),
     y2 = d3.scale.linear().range([height2, 0]),
     y3 = d3.scale.linear().range([height, 0]),
     y4 = d3.scale.linear().range([height2, 0]),
-    qualScale = d3.scale.linear().range([500,0]).domain([0,1]),
+    qualScale = d3.scale.linear().range([550,0]).domain([0,1]),
     qualScale2 = d3.scale.linear().range([0,70]).domain([0,1]),
-    //stemCountScale = d3.scale.linear().range([0,70]),
+    stemCountScale = d3.scale.linear().range([0,70]), 
     lyricScale = d3.scale.linear().range([7,22]); // pt scale
 
 // set up axis scales
@@ -277,15 +283,20 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
         });
 
         $("#helpMask").click(function() {
-          $("#helpMask").hide();
-          $("#helpInstructions").hide();
+          $("#helpMask").addClass("hide");
+          $("#helpInstructions").addClass("hide");
+          event.preventDefault();
         });
 
         $("#helpBtn").click(function() {
           window.scrollTo(0,0);
-          $("#helpMask").show();
-          $("#helpInstructions").show();
+          $("#helpMask").removeClass("hide");
+          $("#helpInstructions").removeClass("hide");
+          event.preventDefault();
         });
+
+        $("#helpMask").addClass("hide");
+        $("#helpInstructions").addClass("hide");
 
         brushed();
       });
@@ -330,7 +341,6 @@ function brushed() {
 
   posText.style("font-size", posSize + "pt")
     .on("click", function(){
-      d3.select(this).style("color","red");
       populateLyricsDetail(trackData, "pos");
   });
   negText.style("font-size", negSize + "pt")
@@ -374,7 +384,11 @@ function brushed() {
     .attr("height", moodHeight)
     .attr("y", function() { return musicQualHeight - moodHeight });
 
-  populateMusicDetailsTable(currentSelection);
+  if (currentDetailType == "WordSort")
+    populateMusicDetailsTableWithWord(currentWord);
+  else
+    populateMusicDetailsTable(currentSelection);
+
   populateStoriesTable();
 }
 
@@ -416,7 +430,6 @@ function populateMusicDetailsTable(valueProperty)
   d3.select("#musicDetailsTable tbody").html(tableHTML);
 }
 
-
 function populateMusicDetailsTableWithWord(word)
 {
   d3.selectAll("#stemDetails td").classed("lit",false);
@@ -450,6 +463,11 @@ function populateMusicDetailsTableWithWord(word)
     });
   });
   tracks = sortByProperty(unsortedTracks, "count");
+  
+  if (maxValue == null)
+    maxValue = 1;
+
+  stemCountScale.domain([0,maxValue]);
 
   currentSelection = word;
 
@@ -462,7 +480,9 @@ function populateMusicDetailsTableWithWord(word)
                     "<td>" + (i+1) + "</td>" + 
                     "<td>" + tracks[i].track + "</td>" + 
                     "<td>" + tracks[i].artist + "</td>" + 
-                    "<td>" + tracks[i].count + "</td></tr>" 
+                    '<td><svg width="' + musicQualWidth + '" height="25px" ><rect width="' + 
+                    stemCountScale(tracks[i].count) + '" height="15px" class="lit" ></rect>' + 
+                    "</svg></td></tr>";
 
   }
 
@@ -644,7 +664,6 @@ function formatLyricsDetail(stemMap) {
 
 }
 
-// ===========================================================
 function getTracksWithWord(tracks, stem) {
 
   var cnt = 0;
@@ -726,6 +745,11 @@ function sortByProperty(array, valueProperty)
         return 0;
     }
   });
+
+  if (sortOrder == 'desc')
+    maxValue = tempArray[0][valueProperty];
+  else
+    maxValue = tempArray[tempArray.length-1][valueProperty];
 
   for (i = 0; i < tempArray.length; i++)
   {

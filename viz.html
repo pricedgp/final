@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="generator"
-    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
     <meta charset="UTF-8" />
     <title>Popular Music and Economic Trends</title>
+    <link rel="Stylesheet" href="./css/styles.css">
+    <link rel="Stylesheet" href="./css/pygment_trac.css">
     <link rel="Stylesheet" href="./css/style.css" type="text/css" />
     <script src="./libs/jquery-1.10.1.js"></script>
     <script src="./libs/d3.v3.min.js"></script>
@@ -13,22 +13,22 @@
     <div id='cssmenu'>
       <ul>
         <li >
-          <a href='index.html'>
+          <a href='./index.html'>
             <span>Home</span>
           </a>
         </li>
         <li class='active'>
-          <a href='viz.html'>
+          <a href='./viz.html'>
             <span>Visualization</span>
           </a>
         </li>
         <li>
-          <a href='www.youtube.com' target='_blank'>
+          <a href='./video.html'>
             <span>Video</span>
           </a>
         </li>
         <li class='last'>
-          <a href='#'>
+          <a href='./ProcBook.html'>
             <span>Process Book</span>
           </a>
         </li>
@@ -84,14 +84,6 @@
                 <h5>LYRICS</h5>
               </th>
             </tr>
-            <tr>
-              <td></td>
-            </tr>
-            <tr>
-              <th colspan="2">
-                <h5> </h5>
-              </th>
-            </tr>
           </thead>
           <tr>
             <td>
@@ -133,7 +125,7 @@
         </table>
       </div>
       <div id="musicDetails">
-        <table id="musicDetailsTable">''
+        <table id="musicDetailsTable">
           <thead>
             <tr>
               <th colspan="4">
@@ -159,7 +151,7 @@
             <thead>
               <tr>
                 <th colspan="2">
-                  <h5>Significant Events</h5>
+                  <h5>SIGNIFICANT EVENTS</h5>
                 </th>
               </tr>
             </thead>
@@ -168,8 +160,8 @@
         </div>
       </div>
     </div>
-    <div id="helpMask"></div>
-    <div id="helpInstructions">
+    <div id="helpMask" class="hide"></div>
+    <div id="helpInstructions" class="hide">
       <div id="musicQualHelp">
       <span class="instructionSpan">Click to see top songs in each category</span> 
       <img src="./images/arrow.png" /></div>
@@ -202,10 +194,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <div class="instructionSpan" id="descriptionHelp">
-        <h5>Project Details</h5>
-        <p>test stuff</p>
       </div>
     </div>
     <script src="./js/visualization.js"></script>

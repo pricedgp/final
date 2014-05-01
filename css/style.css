@@ -1,6 +1,26 @@
 body
 {
 	width: 1260px;
+	font-height: 10px;
+}
+table th tr td
+{
+	border-spacing: 0;
+	border-color: transparent;
+	border-collapse: collapse;
+	margin: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+td
+{
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+th
+{
+	text-align: center;
+	padding: 1px !important;
 }
 h5
 {
@@ -16,10 +36,14 @@ div
 	margin-right: 40px;
 
 }
+#viz
+{
+	margin-right: 0;
+}
 #musicQualities
 {
 	width: 350px;
-	height: 365px;
+	height: 380px;
 	background-color: #E7F0FC;
 	margin-right: 40px;
 }
@@ -31,7 +55,7 @@ div
 #lyricQualities
 {
 	width: 350px;
-	height: 365px;
+	height: 380px;
 	background-color: #E7F0FC;
 	
 }
@@ -42,28 +66,27 @@ div
 #musicDetails
 {
 	width: 350px;
-	height: 365px;
+	height: 380px;
 	background-color: #E7F0FC;
-	
+	margin-right: 0;
 }
 #musicDetails td
 {
 	padding-left: 10px;
 }
-
 #story
 {
-	width: 350px;
+	width: 340px;
 	float: right;
 	background-color: #E7F0FC;
 	padding-left: 10px;
-
+	margin-right: 0;
 }
 #graphContainer
 {
 	margin-top: 25px;
 	clear: left;
-	margin-right: 40px;
+	margin-right: 0;
 }
 #graph
 {
@@ -73,7 +96,7 @@ div
 #title
 {
 	margin-top: 25px;
-	margin-bottom: 30px;
+	margin-bottom: 0px;
 	font-size: 28px;
 	text-align: left;
 	font-family: Arial, sans-serif;
@@ -98,6 +121,7 @@ svg
 .lit
 {
 	color: #C61FCF;
+	fill: #C61FCF;
 }
 .line, .spLine
 {
@@ -115,9 +139,13 @@ svg
 {
 	position: fixed;
 	left: 60px;
-	top: 495px;
+	top: 555px;
 	z-index: 1002;
 	background-color: #ccc;
+}
+#graphLegend table
+{
+	margin: 5px;
 }
 #graphLegend td
 {
@@ -224,9 +252,13 @@ td
 	padding: 5px;
 	border-radius: 5px;
 }
+#MusicPropType
+{
+	width: 95px;
+}
 #musicQualHelp span
 {
-	top: 110px;
+	top: 175px;
 	left: 20px;
 }
 #musicQualHelp img
@@ -235,26 +267,12 @@ td
 	transform: rotate(90deg);
 	-ms-transform: rotate(90deg);
 	-webkit-transform: rotate(90deg);
-	top: 165px;
-	left: 30px;
-}
-#tableSortHelp span
-{
-	top: 215px;
-	left: 960px;
-}
-#tableSortHelp img
-{
-	position: fixed;
-	-transform: rotate(270deg);
-	-ms-transform: rotate(270deg);
-	-webkit-transform: rotate(270deg);
-	top: 155px;
-	left: 1056px;
+	top: 230px;
+	left: 40px;
 }
 #lyricHelp span
 {
-	top: 250px;
+	top: 265px;
 	left: 410px;
 }
 #lyricHelp img
@@ -263,25 +281,14 @@ td
 	-transform: rotate(270deg);
 	-ms-transform: rotate(270deg);
 	-webkit-transform: rotate(270deg);
-	top: 190px;
+	top: 210px;
 	left: 430px;
-}
-#graphHelp span
-{
-	top: 695px;
-	left: 70px;
-}
-#graphHelp img
-{
-	position: fixed;
-	top: 690px;
-	left: 305px;
 }
 #lyricDetailHelp span
 {
 	position: fixed;
-	left: 450px;
-	top: 320px;
+	left: 420px;
+	top: 335px;
 }
 #lyricDetailHelp img
 {
@@ -289,8 +296,33 @@ td
 	-transform: rotate(270deg);
 	-ms-transform: rotate(270deg);
 	-webkit-transform: rotate(270deg);
-	left: 625px;
-	top: 260px;
+	left: 645px;
+	top: 277px;
+}
+#graphHelp span
+{
+	top: 750px;
+	left: 70px;
+}
+#graphHelp img
+{
+	position: fixed;
+	top: 745px;
+	left: 335px;
+}
+#tableSortHelp span
+{
+	top: 255px;
+	left: 960px;
+}
+#tableSortHelp img
+{
+	position: fixed;
+	-transform: rotate(270deg);
+	-ms-transform: rotate(270deg);
+	-webkit-transform: rotate(270deg);
+	top: 195px;
+	left: 1056px;
 }
 #descriptionHelp
 {
@@ -315,6 +347,7 @@ td
     padding-right: 7px;
     color: #C61FCF; 
 }
+<<<<<<< HEAD
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:700);
 #cssmenu {
   background: #828b99;
@@ -422,4 +455,12 @@ td
   #cssmenu ul li:last-child > a:before {
     display: none;
   }
+}
+.hide
+{
+	display: none !important;
+}
+iframe
+{
+	margin-top: 20px;
 }
