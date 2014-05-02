@@ -167,7 +167,15 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
-  focus.append("g")
+  focus.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -30)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Unemployment Rate");
+
+    focus.append("g")
       .attr("class", "y axis")
       .call(yAxis);
 
@@ -175,7 +183,14 @@ d3.csv("./data/econ_data.csv", econType, function(error, data)
   focus.append("g")
       .attr("class", "y axis")
       .attr("transform","translate(" + (width-margin.right) + ",0)")
-      .call(yAxis2);
+      .call(yAxis2)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("text-anchor", "end")
+      .attr("dy", ".75em")
+      .attr("y", 30)
+      .text("S&P 500 % Change");
+
 
   // fill in overview graph
   context.append("path")
